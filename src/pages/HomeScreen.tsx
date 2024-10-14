@@ -1,5 +1,13 @@
 import React from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ImageBackground,
+  ImageBackgroundBase,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {NavigationProp} from '@react-navigation/native';
 
@@ -18,7 +26,7 @@ const TryScreen = (navigation: WelcomeScreenProps) => {
 
   return (
     <LinearGradient
-      colors={['#FCFEFD', '#0A3140']}
+      colors={['#43C6AC', '#F8FFAE']}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1}}
       style={{flex: 1}}>
@@ -38,17 +46,18 @@ const TryScreen = (navigation: WelcomeScreenProps) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.imageButton} onPress={Entry}>
           <Image
-            source={require('../images/Customer.png')} // Müşteri görseli
-            style={styles.imageButtonImage}
+            source={require('../images/aaa.png')}
+            style={[styles.userButtonImage]}
           />
           <Text style={styles.buttonText}>Müşteri</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.imageButton} onPress={BussinesEntry}>
-          <Image
-            source={require('../images/Market.png')} // Esnaf görseli
-            style={styles.imageButtonImage}
-          />
+          <ImageBackground
+            source={require('../images/magazaa.png')} // Eğer bir arka plan görseli varsa
+            style={[styles.imageButtonImage]}>
+            {/* İçerik burada */}
+          </ImageBackground>
           <Text style={styles.buttonText}>Esnaf</Text>
         </TouchableOpacity>
       </View>
@@ -84,8 +93,13 @@ const styles = StyleSheet.create({
     width: '45%', // Buton genişliği
   },
   imageButtonImage: {
-    width: 120, // Görsel genişliği artırıldı
-    height: 120, // Görsel yüksekliği artırıldı
+    width: 140, // Görsel genişliği artırıldı
+    height: 140, // Görsel yüksekliği artırıldı
+    marginBottom: 15, // Görsel ve metin arasındaki boşluk büyütüldü
+  },
+  userButtonImage: {
+    width: 160, // Görsel genişliği artırıldı
+    height: 150, // Görsel yüksekliği artırıldı
     marginBottom: 15, // Görsel ve metin arasındaki boşluk büyütüldü
   },
   buttonText: {
