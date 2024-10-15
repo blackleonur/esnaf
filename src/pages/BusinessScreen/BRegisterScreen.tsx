@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckBox from '@react-native-community/checkbox';
 import styles from '../Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface RegisterScreenProps {
   navigation: NavigationProp<any, any>;
@@ -137,9 +138,17 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
       </View>
 
       {/* Kayıt Ol butonu */}
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Devam Et</Text>
-      </TouchableOpacity>
+      <LinearGradient
+        colors={['#F36117', '#0a040a']}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={{borderRadius: 25}}>
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleRegister}>
+          <Text style={styles.registerButtonText}>Devam Et</Text>
+        </TouchableOpacity>
+      </LinearGradient>
     </View>
   );
 };

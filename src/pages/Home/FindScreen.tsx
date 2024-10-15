@@ -9,6 +9,8 @@ import {
   TextInput,
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons
 
 const categories = [
   {id: '1', name: 'Elektrikçi', image: 'https://bit.ly/47ysqZn'},
@@ -54,64 +56,89 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Arama Çubuğu */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Ne arıyorsunuz?"
-          value={searchText}
-          onChangeText={handleSearch} // Arama işlevi
+    <LinearGradient
+      colors={['#FFFFFF', '#A6A6A6']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={{flex: 1}}>
+      <View style={styles.container}>
+        {/* Arama Çubuğu */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Ne arıyorsunuz?"
+            value={searchText}
+            onChangeText={handleSearch} // Arama işlevi
+          />
+        </View>
+
+        {/* Kategori Listesi */}
+        <FlatList
+          data={filteredCategories} // Filtrelenmiş listeyi göster
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          numColumns={2} // 2 sütunlu görünüm
+          contentContainerStyle={styles.list}
         />
+
+        {/* Alt Menü (Footer) */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => navigation.navigate('SettingsScreen')}>
+            <Icon
+              name="settings"
+              size={24}
+              color="#F36117"
+              style={{marginBottom: 2}}
+            />
+            <Text style={styles.footerButtonText}>Ayarlar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => navigation.navigate('CampaignScreen')}>
+            <Icon
+              name="campaign"
+              size={24}
+              color="#F36117"
+              style={{marginBottom: 2}}
+            />
+            <Text style={styles.footerButtonText}>Kampanyalar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => navigation.navigate('FavsScreen')}>
+            <Icon
+              name="favorite"
+              size={24}
+              color="#F36117"
+              style={{marginBottom: 2}}
+            />
+            <Text style={styles.footerButtonText}>Favoriler</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => navigation.navigate('ProfileScreen')}>
+            <Icon
+              name="person"
+              size={24}
+              color="#F36117"
+              style={{marginBottom: 2}}
+            />
+            <Text style={styles.footerButtonText}>Profil</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* Kategori Listesi */}
-      <FlatList
-        data={filteredCategories} // Filtrelenmiş listeyi göster
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        numColumns={2} // 2 sütunlu görünüm
-        contentContainerStyle={styles.list}
-      />
-
-      {/* Alt Menü (Footer) */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate('SettingsScreen')} // Navigate to SettingsScreen
-        >
-          <Text style={styles.footerButtonText}>Ayarlar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate('CampaignScreen')} // Navigate to CampaignScreen
-        >
-          <Text style={styles.footerButtonText}>Kampanyalar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate('FavsScreen')} // Navigate to FavsScreen
-        >
-          <Text style={styles.footerButtonText}>Favoriler</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => navigation.navigate('ProfileScreen')} // Navigate to ProfileScreen
-        >
-          <Text style={styles.footerButtonText}>Profil</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7',
   },
   header: {
     fontSize: 24,
@@ -124,8 +151,9 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFD9',
     borderRadius: 10,
+    borderColor: '#F36117',
     margin: 8,
     padding: 10,
     alignItems: 'center',
@@ -177,7 +205,7 @@ const styles = StyleSheet.create({
   },
   footerButtonText: {
     fontSize: 12,
-    color: '#FF6347', // Öne çıkan renk
+    fontWeight: 'bold', // Öne çıkan renk
   },
 });
 

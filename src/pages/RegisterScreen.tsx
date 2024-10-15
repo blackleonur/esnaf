@@ -5,10 +5,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckBox from '@react-native-community/checkbox';
 import styles from './Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface RegisterScreenProps {
   navigation: NavigationProp<any, any>;
 }
+
 const RegisterScreen = (navigation: RegisterScreenProps) => {
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
@@ -35,7 +37,7 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
 
     // Telefon numarasının 10 haneli olup olmadığını kontrol et
     if (phone.length !== 10) {
-      Alert.alert('Hata', 'Telefon numaranızı eksik yada hatallı tuşladınız.');
+      Alert.alert('Hata', 'Telefon numaranızı eksik yada hatalı tuşladınız.');
       return;
     }
 
@@ -58,7 +60,7 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
     if (!acceptTerms || !acceptKVKK) {
       Alert.alert(
         'Hata',
-        'Lütfen kullanım şartlarını ve KVKK metnini kabul okuyup ettiğinizi onaylayın.',
+        'Lütfen kullanım şartlarını ve KVKK metnini okuyup kabul ettiğinizi onaylayın.',
       );
       return;
     }
@@ -67,108 +69,147 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
   };
 
   const handleTermsPress = () => {
-    Alert.alert('Kullanım Şartları', 'Burada kullanım şartları yer alacak...');
+    Alert.alert('Kullanım Şartları', 'Burada kullanım şartları yer alacak...', [
+      {
+        text: 'Okudum, Anladım, Kabul Ediyorum',
+        onPress: () => setAcceptTerms(true), // Butona basınca Kullanım Şartlarını kabul et
+      },
+      {
+        text: 'Vazgeç',
+        style: 'cancel',
+      },
+    ]);
   };
 
   const handleKVKKPress = () => {
-    Alert.alert('KVKK Metni', 'Burada KVKK metni yer alacak...');
+    Alert.alert('KVKK Metni', 'Burada KVKK metni yer alacak...', [
+      {
+        text: 'Okudum, Anladım, Kabul Ediyorum',
+        onPress: () => setAcceptKVKK(true), // Butona basınca KVKK metnini kabul et
+      },
+      {
+        text: 'Vazgeç',
+        style: 'cancel',
+      },
+    ]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Kayıt Ol</Text>
+    <LinearGradient
+      colors={['#FFFFFF', '#A6A6A6']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={{flex: 1}}>
+      <View style={styles.container}>
+        <Text style={styles.header}>Kayıt Ol</Text>
 
-      {/* Ad */}
-      <Text style={styles.label}>Ad</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Adınızı girin"
-        value={name}
-        onChangeText={setName}
-      />
-
-      {/* Soyad */}
-      <Text style={styles.label}>Soyad</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Soyadınızı girin"
-        value={surname}
-        onChangeText={setSurname}
-      />
-
-      {/* E-posta */}
-      <Text style={styles.label}>E-posta</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="E-posta adresinizi girin"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-
-      {/* Telefon */}
-      <Text style={styles.label}>Telefon</Text>
-      <View style={styles.phoneContainer}>
-        <TouchableOpacity style={styles.countryCode}>
-          <Icon name="flag" size={20} color="red" />
-          <Text style={styles.countryCodeText}>+90</Text>
-        </TouchableOpacity>
-        <TextInput
-          style={styles.phoneInput}
-          placeholder="Telefon numaranızı girin"
-          value={phone}
-          onChangeText={text => {
-            // Yalnızca 10 haneli numara kabul edilecek
-            if (text.length <= 10) {
-              setPhone(text);
-            }
-          }}
-          keyboardType="phone-pad"
-          maxLength={10} // Telefon numarasını 10 hane ile sınırlandır
-        />
-      </View>
-
-      {/* Şifre */}
-      <Text style={styles.label}>Şifre</Text>
-      <View style={styles.passwordContainer}>
+        {/* Ad */}
+        <Text style={styles.label}>Ad</Text>
         <TextInput
           style={styles.input}
-          placeholder="Şifrenizi girin"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!passwordVisible}
+          placeholder="Adınızı girin"
+          value={name}
+          onChangeText={setName}
         />
-        <TouchableOpacity
-          onPress={() => setPasswordVisible(!passwordVisible)}
-          style={styles.eyeIcon}>
-          <Icon name={passwordVisible ? 'eye' : 'eye-slash'} size={20} />
-        </TouchableOpacity>
-      </View>
 
-      {/* Şartlar ve KVKK onay kutuları */}
-      <View style={styles.checkboxContainer}>
-        <CheckBox value={acceptTerms} onValueChange={setAcceptTerms} />
-        <TouchableOpacity onPress={handleTermsPress}>
-          <Text style={styles.checkboxText}>
-            Kullanım şartlarını kabul ediyorum
-          </Text>
-        </TouchableOpacity>
-      </View>
+        {/* Soyad */}
+        <Text style={styles.label}>Soyad</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Soyadınızı girin"
+          value={surname}
+          onChangeText={setSurname}
+        />
 
-      <View style={styles.checkboxContainer}>
-        <CheckBox value={acceptKVKK} onValueChange={setAcceptKVKK} />
-        <TouchableOpacity onPress={handleKVKKPress}>
-          <Text style={styles.checkboxText}>
-            KVKK metnini okudum, onaylıyorum
-          </Text>
-        </TouchableOpacity>
-      </View>
+        {/* E-posta */}
+        <Text style={styles.label}>E-posta</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="E-posta adresinizi girin"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
-      {/* Kayıt Ol butonu */}
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Kayıt Ol</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Telefon */}
+        <Text style={styles.label}>Telefon</Text>
+        <View style={styles.phoneContainer}>
+          <TouchableOpacity style={styles.countryCode}>
+            <Icon name="flag" size={20} color="red" />
+            <Text style={styles.countryCodeText}>+90</Text>
+          </TouchableOpacity>
+          <TextInput
+            style={styles.phoneInput}
+            placeholder="Telefon numaranızı girin"
+            value={phone}
+            onChangeText={text => {
+              if (text.length <= 10) {
+                setPhone(text);
+              }
+            }}
+            keyboardType="phone-pad"
+            maxLength={10} // Telefon numarasını 10 hane ile sınırlandır
+          />
+        </View>
+
+        {/* Şifre */}
+        <Text style={styles.label}>Şifre</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Şifrenizi girin"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!passwordVisible}
+          />
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+            style={styles.eyeIcon}>
+            <Icon name={passwordVisible ? 'eye' : 'eye-slash'} size={20} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Şartlar ve KVKK onay kutuları */}
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={acceptTerms}
+            onValueChange={() => {}} // Kullanıcı elle değiştiremesin
+            disabled={!acceptTerms} // Butona basmadan checkbox pasif kalsın
+          />
+          <TouchableOpacity onPress={handleTermsPress}>
+            <Text style={styles.checkboxText}>
+              Kullanım şartlarını kabul ediyorum
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={acceptKVKK}
+            onValueChange={() => {}} // Kullanıcı elle değiştiremesin
+            disabled={!acceptKVKK} // Butona basmadan checkbox pasif kalsın
+          />
+          <TouchableOpacity onPress={handleKVKKPress}>
+            <Text style={styles.checkboxText}>
+              KVKK metnini okudum, onaylıyorum
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Kayıt Ol butonu */}
+        <LinearGradient
+          colors={['#F36117', '#0a040a']}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+          style={{borderRadius: 25}}>
+          <TouchableOpacity
+            style={styles.registerButton}
+            onPress={handleRegister}>
+            <Text style={styles.registerButtonText}>Kayıt Ol</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      </View>
+    </LinearGradient>
   );
 };
 

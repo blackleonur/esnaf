@@ -12,6 +12,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface JobItem {
   id: string;
@@ -77,49 +78,55 @@ const BusinessHomeScreen: React.FC = () => {
       <View style={styles.row}>
         <Text style={styles.label}>Telefon Numarası: {item.phoneNumber}</Text>
         <TouchableOpacity onPress={() => handleCallPress(item.phoneNumber)}>
-          <Ionicons name="call" size={24} color="#007BFF" />
+          <Ionicons name="call" size={24} color="#F36117" />
         </TouchableOpacity>
       </View>
       <View style={styles.row}>
         <Text style={styles.label}>Adres: {item.address}</Text>
         <TouchableOpacity onPress={() => handleLocationPress(item.address)}>
-          <Ionicons name="location" size={24} color="#007BFF" />
+          <Ionicons name="location" size={24} color="#F36117" />
         </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.shopName}>Mekan Tesisat</Text>
+    <LinearGradient
+      colors={['#FFFFFF', '#A6A6A6']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={{flex: 1}}>
+      <View style={styles.container}>
+        <Text style={styles.shopName}>Mekan Tesisat</Text>
 
-      <Image
-        source={{uri: 'https://picsum.photos/id/237/200/300'}}
-        style={styles.workplaceImage}
-      />
+        <Image
+          source={{uri: 'https://picsum.photos/id/237/200/300'}}
+          style={styles.workplaceImage}
+        />
 
-      <Text style={styles.pendingJobsTitle}>Bekleyen İşler</Text>
-      <FlatList
-        data={jobData}
-        renderItem={renderJobItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.jobList}
-      />
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton} onPress={goProfile}>
-          <Ionicons name="person" size={24} color="#007BFF" />
-          <Text style={styles.footerButtonText}>Profil</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton} onPress={goSettings}>
-          <Ionicons name="settings" size={24} color="#007BFF" />
-          <Text style={styles.footerButtonText}>Ayarlar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton} onPress={goCampaigns}>
-          <Ionicons name="megaphone" size={24} color="#007BFF" />
-          <Text style={styles.footerButtonText}>Kampanya Düzenle</Text>
-        </TouchableOpacity>
+        <Text style={styles.pendingJobsTitle}>Bekleyen İşler</Text>
+        <FlatList
+          data={jobData}
+          renderItem={renderJobItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.jobList}
+        />
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.footerButton} onPress={goProfile}>
+            <Ionicons name="person" size={24} color="#F36117" />
+            <Text style={styles.footerButtonText}>Profil</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.footerButton} onPress={goSettings}>
+            <Ionicons name="settings" size={24} color="#F36117" />
+            <Text style={styles.footerButtonText}>Ayarlar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.footerButton} onPress={goCampaigns}>
+            <Ionicons name="megaphone" size={24} color="#F36117" />
+            <Text style={styles.footerButtonText}>Kampanya Düzenle</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -154,7 +161,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   card: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#FFFFD9',
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
@@ -208,7 +215,7 @@ const styles = StyleSheet.create({
   footerButtonText: {
     marginTop: 4,
     fontSize: 14,
-    color: '#007BFF',
+    fontWeight: 'bold',
   },
 });
 

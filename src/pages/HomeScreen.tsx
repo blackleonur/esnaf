@@ -7,15 +7,47 @@ import {
   Text,
   ImageBackground,
   ImageBackgroundBase,
+  Animated, // Animated import
+  Easing,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {NavigationProp} from '@react-navigation/native';
+import {useRef, useEffect} from 'react';
+import {useState} from 'react';
 
 interface WelcomeScreenProps {
   navigation: NavigationProp<any, any>;
 }
 
 const TryScreen = (navigation: WelcomeScreenProps) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [displayedText, setDisplayedText] = useState(''); // Ekranda gösterilecek metin
+
+  useEffect(() => {
+    const startAnimation = () => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scaleAnim, {
+            toValue: 1.2, // Büyüme oranı
+            duration: 1000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleAnim, {
+            toValue: 1, // Orijinal boyut
+            duration: 1000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    };
+
+    startAnimation(); // Animasyonu başlat
+  }, [scaleAnim]);
+
+  // Harflerin tek tek yazılması animasyonu
+
   function Entry() {
     navigation.navigation.navigate('CustomerEntryScreen');
   }
@@ -26,15 +58,15 @@ const TryScreen = (navigation: WelcomeScreenProps) => {
 
   return (
     <LinearGradient
-      colors={['#43C6AC', '#F8FFAE']}
+      colors={['#FFFFFF', '#A6A6A6']}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1}}
       style={{flex: 1}}>
       {/* Logo */}
       <View style={styles.imageContainer}>
-        <Image
+        <Animated.Image
           source={require('../images/Logo.png')}
-          style={styles.image}
+          style={[styles.image, {transform: [{scale: scaleAnim}]}]} // Animasyonlu stil
           resizeMode="contain"
         />
       </View>
@@ -79,7 +111,7 @@ const styles = StyleSheet.create({
     marginTop: 70,
     textAlign: 'center',
     fontSize: 40,
-    color: '#0A3140',
+    color: '#0f0214',
     fontWeight: 'bold',
   },
   buttonContainer: {
@@ -103,7 +135,7 @@ const styles = StyleSheet.create({
     marginBottom: 15, // Görsel ve metin arasındaki boşluk büyütüldü
   },
   buttonText: {
-    color: '#E8F2F2',
+    color: '#0f0214',
     fontSize: 22, // Yazı boyutu büyütüldü
     fontWeight: 'bold',
   },

@@ -11,18 +11,33 @@ import CustomerEntryStyle from '../../Styles/CustomerEntryStyle';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
+import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome'; // İkonu ekledik
 
 interface SeperatorText {
   text: string;
+  textColor?: string;
+  leftLineColor?: string; // Sol çizgi rengi için
+  rightLineColor?: string; // Sağ çizgi rengi için
 }
 
-const SeparatorWithText: React.FC<SeperatorText> = ({text = 'VEYA'}) => {
+const SeparatorWithText: React.FC<SeperatorText> = ({
+  text = 'VEYA',
+  textColor = 'black',
+  leftLineColor = 'gray', // Varsayılan sol çizgi rengi
+  rightLineColor = 'gray', // Varsayılan sağ çizgi rengi
+}) => {
   return (
     <View style={CustomerEntryStyle.separatorContainer}>
-      <View style={CustomerEntryStyle.line} />
-      <Text style={CustomerEntryStyle.text}>{text}</Text>
-      <View style={CustomerEntryStyle.line} />
+      <View
+        style={[CustomerEntryStyle.line, {backgroundColor: leftLineColor}]}
+      />
+      <Text style={[CustomerEntryStyle.seperatorText, {color: textColor}]}>
+        {text}
+      </Text>
+      <View
+        style={[CustomerEntryStyle.line, {backgroundColor: rightLineColor}]}
+      />
     </View>
   );
 };
@@ -50,74 +65,101 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
     navigation.navigation.navigate('RegisterScreen');
   }
   return (
-    <View style={CustomerEntryStyle.container}>
-      <Image
-        style={CustomerEntryStyle.Image}
-        source={require('../../../images/Logo.png')}
-      />
-      <View style={CustomerEntryStyle.HeaderContainer}>
-        <Text style={CustomerEntryStyle.HeaderText}>Mail</Text>
-        <TextInput
-          style={CustomerEntryStyle.Text}
-          placeholder="E mail Adresi Giriniz"
-          value={mail}
-          onChangeText={setMail}></TextInput>
-        <Text style={CustomerEntryStyle.HeaderText}>Şifre</Text>
-        <View style={{position: 'relative'}}>
+    <LinearGradient
+      colors={['#FFFFFF', '#A6A6A6']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={{flex: 1}}>
+      <View style={CustomerEntryStyle.container}>
+        <Image
+          style={CustomerEntryStyle.Image}
+          source={require('../../../images/Logo.png')}
+        />
+        <View style={CustomerEntryStyle.HeaderContainer}>
+          <Text style={CustomerEntryStyle.HeaderText}>Mail</Text>
           <TextInput
-            style={[CustomerEntryStyle.Text, {paddingRight: 40}]}
-            placeholder="Şifrenizi Giriniz"
-            secureTextEntry={!isPasswordVisible} // Şifreyi göster/gizle
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <TouchableOpacity
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)} // Tıklanınca görünürlüğü değiştir
-            style={{
-              position: 'absolute', // İkonun pozisyonunu ayarlıyoruz
-              right: 10, // Sağ tarafa hizalıyoruz
-              top: 9, // İkonu TextInput ile dikey olarak ortalıyoruz
-            }}>
-            <Icon
-              name={isPasswordVisible ? 'eye-slash' : 'eye'} // Şifre görünürse 'eye-slash', değilse 'eye' ikonu
-              size={24}
-              color="gray"
-              style={{marginRight: 10}} // Stil ayarları (ikon boyutu ve sağ marj)
+            style={CustomerEntryStyle.Text}
+            placeholder="E mail Adresi Giriniz"
+            value={mail}
+            onChangeText={setMail}></TextInput>
+          <Text style={CustomerEntryStyle.HeaderText}>Şifre</Text>
+          <View style={{position: 'relative'}}>
+            <TextInput
+              style={[CustomerEntryStyle.Text, {paddingRight: 40}]}
+              placeholder="Şifrenizi Giriniz"
+              secureTextEntry={!isPasswordVisible} // Şifreyi göster/gizle
+              value={password}
+              onChangeText={setPassword}
             />
-          </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)} // Tıklanınca görünürlüğü değiştir
+              style={{
+                position: 'absolute', // İkonun pozisyonunu ayarlıyoruz
+                right: 10, // Sağ tarafa hizalıyoruz
+                top: 9, // İkonu TextInput ile dikey olarak ortalıyoruz
+              }}>
+              <Icon
+                name={isPasswordVisible ? 'eye-slash' : 'eye'} // Şifre görünürse 'eye-slash', değilse 'eye' ikonu
+                size={24}
+                color="gray"
+                style={{marginRight: 10}} // Stil ayarları (ikon boyutu ve sağ marj)
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={CustomerEntryStyle.entrybuttoncontainer}>
+            <LinearGradient
+              colors={['#F36117', '#0a040a']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              style={{borderRadius: 25}}>
+              <TouchableOpacity style={CustomerEntryStyle.EntryButton}>
+                <Text style={CustomerEntryStyle.ButtonText} onPress={Entry}>
+                  Giriş Yap
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+
+          <SeparatorWithText
+            text="VEYA"
+            textColor="gray"
+            leftLineColor="gray"
+            rightLineColor="gray"
+          />
         </View>
-        <View>
-          <TouchableOpacity style={CustomerEntryStyle.EntryButton}>
-            <Text style={CustomerEntryStyle.ButtonText} onPress={Entry}>
-              Giriş Yap
+        <View style={CustomerEntryStyle.ButtonContainer}>
+          <TouchableOpacity
+            style={CustomerEntryStyle.Button}
+            onPress={Register}>
+            <Text style={CustomerEntryStyle.Buttonkayit}>Kayıt ol</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={CustomerEntryStyle.Button}>
+            <Icon
+              name="apple"
+              size={25}
+              color="black"
+              style={{marginLeft: 10, marginRight: 125}}
+            />
+            <Text style={CustomerEntryStyle.ButtonWithSsoText}>
+              Apple ile giriş yap
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={CustomerEntryStyle.Button}>
+            <Icon
+              name="google"
+              size={25}
+              color="black"
+              style={{marginLeft: 10, marginRight: 122}}
+            />
+            <Text style={CustomerEntryStyle.ButtonWithSsoText}>
+              Google ile giriş yap
             </Text>
           </TouchableOpacity>
         </View>
-        <SeparatorWithText text="VEYA" />
       </View>
-      <View style={CustomerEntryStyle.ButtonContainer}>
-        <TouchableOpacity style={CustomerEntryStyle.Button} onPress={Register}>
-          <Text style={CustomerEntryStyle.Buttonkayit}>Kayıt ol</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={CustomerEntryStyle.Button}>
-          <Image
-            style={CustomerEntryStyle.buttonImage}
-            source={require('../../../images/Apple.png')}
-          />
-          <Text style={CustomerEntryStyle.ButtonText}>Apple ile giriş yap</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={CustomerEntryStyle.Button}>
-          <Image
-            style={CustomerEntryStyle.buttonImage}
-            source={require('../../../images/google.png')}
-          />
-          <Text style={CustomerEntryStyle.ButtonText}>
-            Google ile giriş yap
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </LinearGradient>
   );
 }
 

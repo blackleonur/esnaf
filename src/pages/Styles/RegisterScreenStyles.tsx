@@ -4,7 +4,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
   },
   header: {
     fontSize: 24,
@@ -23,6 +22,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 16,
     marginBottom: 15,
+    borderWidth: 0.4,
+    paddingRight: 45,
   },
   phoneContainer: {
     flexDirection: 'row',
@@ -49,13 +50,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 15,
+    position: 'relative',
   },
   eyeIcon: {
     position: 'absolute',
-    right: 15,
+    right: 10, // Position it to the right inside the input
+    top: '50%', // Align vertically in the center
+    transform: [{translateY: -18}], // Adjust vertically to center the icon
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -69,10 +71,8 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline', // Tıklanabilir görünüm için
   },
   registerButton: {
-    backgroundColor: '#00aaff',
     paddingVertical: 15,
     borderRadius: 8,
-    marginTop: 20,
     alignItems: 'center',
   },
   registerButtonText: {

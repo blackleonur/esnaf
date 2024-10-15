@@ -1,3 +1,4 @@
+import {cloneElement} from 'react';
 import {StyleSheet} from 'react-native';
 const BEntryStyle = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#FFFFFF'},
@@ -11,16 +12,11 @@ const BEntryStyle = StyleSheet.create({
     paddingLeft: 7,
     alignContent: 'center',
   },
-  ButtonContainer: {marginTop: 10},
+  ButtonContainer: {marginLeft: 5, marginRight: 5},
   Button: {
-    flexDirection: 'row',
-    backgroundColor: '#C3C5C6',
-    marginTop: 15,
+    paddingBottom: 10,
+    paddingTop: 10,
 
-    borderWidth: 1,
-    paddingBottom: 15,
-    paddingTop: 15,
-    borderRadius: 9,
     margin: 7,
   },
   buttonImage: {
@@ -29,39 +25,50 @@ const BEntryStyle = StyleSheet.create({
     marginRight: 115,
     marginLeft: 12,
   },
-  ButtonText: {fontWeight: '700', fontSize: 18},
+  ButtonText: {color: '#fff', fontSize: 18},
   Image: {width: 175, height: 175, alignSelf: 'center', marginTop: 25},
   EntryButton: {
-    backgroundColor: '#44A6E3',
-    marginTop: 45,
-    paddingLeft: 190,
-    borderWidth: 1,
-    paddingBottom: 15,
-    paddingTop: 15,
-    borderRadius: 9,
+    paddingHorizontal: 50,
+    paddingVertical: 15,
+    alignItems: 'center', // Buton içeriğini yatayda ortalar
   },
-
   separatorContainer: {
     marginTop: 35,
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 10,
+    alignContent: 'center',
   },
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#C3C5C6', // Çizgi rengi
+    backgroundColor: 'gray', // Çizgi rengi
   },
   text: {
-    flex: 1,
     marginHorizontal: 10,
     fontSize: 16,
-    color: '#D5D6D7', // Yazı rengi
+    color: 'gray', // Yazı rengi
+    alignSelf: 'center',
+    paddingLeft: 30,
+    paddingRight: 30,
   },
   Buttonkayit: {
-    marginLeft: 190,
-    fontWeight: '700',
+    textAlign: 'center', // Yazıyı ortalar
+    color: '#fff',
     fontSize: 18,
+  },
+  NonMarketText: {
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 18,
+  },
+  NonMarketButton: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Button içeriğini yatayda ortalar
+    paddingBottom: 10,
+    paddingTop: 10,
+    borderRadius: 5,
+    margin: 7,
   },
 });
 

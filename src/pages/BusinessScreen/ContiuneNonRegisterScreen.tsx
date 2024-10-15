@@ -11,7 +11,7 @@ import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-
+import LinearGradient from 'react-native-linear-gradient';
 const ContiuneNonRegisterScreen = () => {
   const [workplaceName, setWorkplaceName] = useState('');
   const [address, setAddress] = useState('');
@@ -88,70 +88,81 @@ const ContiuneNonRegisterScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Profilinizi Doldurun</Text>
+    <LinearGradient
+      colors={['#FFFFFF', '#A6A6A6']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={{flex: 1}}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Profilinizi Doldurun</Text>
 
-      <Text>İş Kategorisi</Text>
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setItems}
-        placeholder="Kategori seçin..."
-        searchable={true}
-        style={styles.dropdown}
-        searchTextInputStyle={styles.searchInput}
-        listItemLabelStyle={styles.listItemLabel}
-        dropDownContainerStyle={styles.dropDownContainer}
-        ArrowUpIconComponent={({style}) => (
-          <Text style={[style, {fontSize: 20}]}>▲</Text>
-        )}
-        ArrowDownIconComponent={({style}) => (
-          <Text style={[style, {fontSize: 20}]}>▼</Text>
-        )}
-      />
-
-      <Text>Tc Kimlik Numarası</Text>
-      <TextInput
-        style={styles.input}
-        value={taxNumber}
-        onChangeText={setTaxNumber}
-        placeholder="TC Kimlik Numaranızı Girin"
-        keyboardType="numeric"
-      />
-
-      <View style={styles.checkboxContainer}>
-        <CheckBox
-          value={termsAccepted}
-          tintColors={{true: '#007BFF', false: '#ccc'}}
-          disabled={true}
+        <Text>İş Kategorisi</Text>
+        <DropDownPicker
+          open={open}
+          value={value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+          placeholder="Kategori seçin..."
+          searchable={true}
+          style={styles.dropdown}
+          searchTextInputStyle={styles.searchInput}
+          listItemLabelStyle={styles.listItemLabel}
+          dropDownContainerStyle={styles.dropDownContainer}
+          ArrowUpIconComponent={({style}) => (
+            <Text style={[style, {fontSize: 20}]}>▲</Text>
+          )}
+          ArrowDownIconComponent={({style}) => (
+            <Text style={[style, {fontSize: 20}]}>▼</Text>
+          )}
         />
-        <TouchableOpacity onPress={showTermsAlert}>
-          <Text style={styles.checkboxText}>
-            Kullanım şartlarını kabul ediyorum
-          </Text>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.checkboxContainer}>
-        <CheckBox
-          value={kvkkAccepted}
-          tintColors={{true: '#007BFF', false: '#ccc'}}
-          disabled={true}
+        <Text>Tc Kimlik Numarası</Text>
+        <TextInput
+          style={styles.input}
+          value={taxNumber}
+          onChangeText={setTaxNumber}
+          placeholder="TC Kimlik Numaranızı Girin"
+          keyboardType="numeric"
         />
-        <TouchableOpacity onPress={showKvkkAlert}>
-          <Text style={styles.checkboxText}>
-            KVKK metnini okudum, onaylıyorum
-          </Text>
-        </TouchableOpacity>
-      </View>
 
-      <TouchableOpacity style={styles.button} onPress={goNonPrice}>
-        <Text style={styles.buttonText}>Fiyat Seçeneklerini Gir</Text>
-      </TouchableOpacity>
-    </View>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={termsAccepted}
+            tintColors={{true: '#007BFF', false: '#ccc'}}
+            disabled={true}
+          />
+          <TouchableOpacity onPress={showTermsAlert}>
+            <Text style={styles.checkboxText}>
+              Kullanım şartlarını kabul ediyorum
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={kvkkAccepted}
+            tintColors={{true: '#007BFF', false: '#ccc'}}
+            disabled={true}
+          />
+          <TouchableOpacity onPress={showKvkkAlert}>
+            <Text style={styles.checkboxText}>
+              KVKK metnini okudum, onaylıyorum
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <LinearGradient
+          colors={['#F36117', '#0a040a']}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+          style={{borderRadius: 65}}>
+          <TouchableOpacity style={styles.button} onPress={goNonPrice}>
+            <Text style={styles.buttonText}>Fiyat Seçeneklerini Gir</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      </View>
+    </LinearGradient>
   );
 };
 
@@ -200,11 +211,10 @@ const styles = StyleSheet.create({
   },
   checkboxText: {
     fontSize: 16,
-    color: 'blue',
+    color: 'gray',
     marginLeft: 10,
   },
   button: {
-    backgroundColor: '#007BFF',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',

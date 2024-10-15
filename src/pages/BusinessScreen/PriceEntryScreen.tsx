@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-
+import LinearGradient from 'react-native-linear-gradient';
 type RootStackParamList = {
   BussinesHomeScreen: undefined;
 };
@@ -34,49 +34,49 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
       id: '1',
       label: 'Metrekare ücreti',
       value: 10,
-      unit: 'TL/m²',
+      unit: 'TL',
       enabled: true,
     },
     {
       id: '2',
       label: 'Koltuk ücreti',
       value: 15,
-      unit: 'TL/koltuk',
+      unit: 'TL',
       enabled: true,
     },
     {
       id: '3',
       label: 'Overlok ücreti',
       value: 20,
-      unit: 'TL/battaniye',
+      unit: 'TL',
       enabled: true,
     },
     {
       id: '4',
       label: 'Yorgan ücreti',
       value: 20,
-      unit: 'TL/battaniye',
+      unit: 'TL',
       enabled: true,
     },
     {
       id: '5',
       label: 'Taşpınar halı m2 ücreti',
       value: 20,
-      unit: 'TL/m²',
+      unit: 'TL',
       enabled: true,
     },
     {
       id: '6',
       label: 'Battaniye',
       value: 20,
-      unit: 'TL/battaniye',
+      unit: 'TL',
       enabled: true,
     },
     {
       id: '7',
       label: 'Koltuk',
       value: 20,
-      unit: 'TL/koltuk',
+      unit: 'TL',
       enabled: true,
     },
   ]);
@@ -150,22 +150,34 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
       </View>
       {item.enabled && (
         <View style={styles.controls}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleDecrement(item.id)}>
-            <Text style={styles.buttonText}>-</Text>
-          </TouchableOpacity>
+          <LinearGradient
+            colors={['#F36117', '#0a040a']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            style={{borderRadius: 25}}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleDecrement(item.id)}>
+              <Text style={styles.buttonText}>-</Text>
+            </TouchableOpacity>
+          </LinearGradient>
           <TextInput
             style={styles.input}
             value={String(item.value)}
             onChangeText={text => handleValueChange(item.id, parseInt(text))}
             keyboardType="numeric"
           />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleIncrement(item.id)}>
-            <Text style={styles.buttonText}>+</Text>
-          </TouchableOpacity>
+          <LinearGradient
+            colors={['#F36117', '#0a040a']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            style={{borderRadius: 25}}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleIncrement(item.id)}>
+              <Text style={styles.buttonText}>+</Text>
+            </TouchableOpacity>
+          </LinearGradient>
           <Text style={styles.unit}>{item.unit}</Text>
         </View>
       )}
@@ -181,44 +193,50 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.title}>Fiyat Seçenekleri</Text>
-      <Text style={styles.subtitle}>
-        Lütfen size uygun fiyat seçeneklerini seçin.
-      </Text>
+    <LinearGradient
+      colors={['#FFFFFF', '#A6A6A6']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={{flex: 1}}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <Text style={styles.title}>Fiyat Seçenekleri</Text>
+        <Text style={styles.subtitle}>
+          Lütfen size uygun fiyat seçeneklerini seçin.
+        </Text>
 
-      <Text style={styles.serviceHeader}>Hizmetler</Text>
+        <Text style={styles.serviceHeader}>Hizmetler</Text>
 
-      <FlatList
-        data={pricingData}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        style={{maxHeight: 650}}
-      />
-
-      <View style={styles.newServiceContainer}>
-        <TextInput
-          style={styles.newServiceInput}
-          placeholder="Yeni hizmet ekle"
-          value={newServiceLabel}
-          onChangeText={setNewServiceLabel}
+        <FlatList
+          data={pricingData}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          style={{maxHeight: 650}}
         />
-        <TouchableOpacity style={styles.addButton} onPress={handleSave}>
-          <Text style={styles.buttonText}>Ekle ve Kaydet</Text>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.cancelButton}>
-          <Text style={styles.buttonText}>İptal</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton} onPress={goHome}>
-          <Text style={styles.buttonText}>Kaydet</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.newServiceContainer}>
+          <TextInput
+            style={styles.newServiceInput}
+            placeholder="Yeni hizmet ekle"
+            value={newServiceLabel}
+            onChangeText={setNewServiceLabel}
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleSave}>
+            <Text style={styles.buttonText}>Ekle ve Kaydet</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.cancelButton}>
+            <Text style={styles.buttonText}>İptal</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.saveButton} onPress={goHome}>
+            <Text style={styles.buttonText}>Kaydet</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 };
 
@@ -226,7 +244,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f8f8',
   },
   title: {
     fontSize: 24,
@@ -263,11 +280,11 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
+    borderColor: 'gray',
+    padding: 12,
+    borderRadius: 25,
     textAlign: 'center',
-    width: 60,
+    width: 70,
   },
   unit: {
     marginLeft: 10,
@@ -275,7 +292,6 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#007BFF',
     padding: 12,
     borderRadius: 5,
     marginHorizontal: 10,
@@ -291,7 +307,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   cancelButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: 'red',
     padding: 15,
     borderRadius: 8,
     flex: 1,
@@ -299,7 +315,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: 'blue',
     padding: 15,
     borderRadius: 8,
     flex: 1,
@@ -314,7 +330,7 @@ const styles = StyleSheet.create({
   newServiceInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     padding: 10,
     borderRadius: 5,
     textAlign: 'center',

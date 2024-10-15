@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckBox from '@react-native-community/checkbox';
 import styles from '../Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface RegisterScreenProps {
   navigation: NavigationProp<any, any>;
@@ -145,29 +146,18 @@ const NonBussineRegisterScreen = (navigation: RegisterScreenProps) => {
         </TouchableOpacity>
       </View>
 
-      {/* Şartlar ve KVKK onay kutuları */}
-      <View style={styles.checkboxContainer}>
-        <CheckBox value={acceptTerms} onValueChange={setAcceptTerms} />
-        <TouchableOpacity onPress={handleTermsPress}>
-          <Text style={styles.checkboxText}>
-            Kullanım şartlarını kabul ediyorum
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.checkboxContainer}>
-        <CheckBox value={acceptKVKK} onValueChange={setAcceptKVKK} />
-        <TouchableOpacity onPress={handleKVKKPress}>
-          <Text style={styles.checkboxText}>
-            KVKK metnini okudum, onaylıyorum
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Kayıt Ol butonu */}
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Devam Et</Text>
-      </TouchableOpacity>
+      <LinearGradient
+        colors={['#F36117', '#0a040a']}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={{borderRadius: 65, marginTop: 20}}>
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleRegister}>
+          <Text style={styles.registerButtonText}>Devam Et</Text>
+        </TouchableOpacity>
+      </LinearGradient>
     </View>
   );
 };
