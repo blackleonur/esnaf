@@ -6,8 +6,17 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
+
+// Cihazın genişlik ve yüksekliğini alıyoruz
+const {width, height} = Dimensions.get('window');
+
+// Dinamik olarak boyutlandırma fonksiyonları
+const scale = (size: number) => (width / 375) * size; // iPhone 11 genişliği baz alındı
+const verticalScale = (size: number) => (height / 812) * size;
 
 const AddCampaignScreen: React.FC<{navigation: NavigationProp<any>}> = ({
   navigation,
@@ -18,9 +27,8 @@ const AddCampaignScreen: React.FC<{navigation: NavigationProp<any>}> = ({
   const [endDate, setEndDate] = useState('2023-06-30');
 
   const handleAddCampaign = () => {
-    // Kampanyayı ekleme işlemi
     Alert.alert('Başarılı', 'Yeni kampanya eklendi.');
-    navigation.goBack(); // Geri dön
+    navigation.goBack();
   };
 
   return (
@@ -62,32 +70,32 @@ const AddCampaignScreen: React.FC<{navigation: NavigationProp<any>}> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: scale(16),
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 18,
+    fontSize: scale(18),
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: verticalScale(16),
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 16,
+    borderRadius: scale(8),
+    padding: scale(10),
+    fontSize: scale(16),
+    marginBottom: verticalScale(16),
   },
   saveButton: {
     backgroundColor: '#28a745',
-    padding: 16,
-    borderRadius: 8,
+    padding: scale(16),
+    borderRadius: scale(8),
     alignItems: 'center',
   },
   saveButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: scale(16),
   },
 });
 

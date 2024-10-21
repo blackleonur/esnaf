@@ -21,7 +21,7 @@ const SeparatorWithText: React.FC<SeperatorText> = ({text = 'VEYA'}) => {
   return (
     <View style={BEntryStyle.separatorContainer}>
       <View style={BEntryStyle.line} />
-      <Text style={BEntryStyle.text}>{text}</Text>
+      <Text style={BEntryStyle.seperatorText}>{text}</Text>
       <View style={BEntryStyle.line} />
     </View>
   );
@@ -121,9 +121,9 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
             end={{x: 1, y: 1}}
             style={{borderRadius: 65, marginTop: 20}}>
             <TouchableOpacity
-              style={BEntryStyle.NonMarketButton}
+              style={BEntryStyle.Button}
               onPress={goNonBussines}>
-              <Text style={BEntryStyle.NonMarketText}>
+              <Text style={BEntryStyle.Buttonkayit}>
                 İş Yeri Olmadan Kayıt Ol
               </Text>
             </TouchableOpacity>

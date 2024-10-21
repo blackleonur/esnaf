@@ -1,5 +1,15 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Switch, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Switch,
+  StyleSheet,
+  Dimensions,
+  Image,
+} from 'react-native';
+
+const {width, height} = Dimensions.get('window');
 
 const SettingsScreen = () => {
   const [pushEnabled, setPushEnabled] = React.useState(false);
@@ -12,6 +22,16 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Logo */}
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('./../../../images/Logo.png')} // Buraya kendi logo yolunuzu ekleyin
+          style={styles.logo}
+          resizeMode="contain" // Görselin boyutuna göre orantılı şekilde görünmesini sağlar
+        />
+      </View>
+
+      {/* Ayarlar Başlığı */}
       <Text style={styles.header}>Ayarlar</Text>
 
       {/* Genel Ayarlar */}
@@ -78,28 +98,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
+    padding: width * 0.04, // Dinamik padding
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginVertical: height * 0.02, // Dinamik margin
+  },
+  logo: {
+    width: width * 0.4, // Cihaz genişliğine göre dinamik olarak %50 genişlik
+    height: height * 0.06, // Cihaz yüksekliğine göre dinamik olarak %10 yükseklik
   },
   header: {
-    fontSize: 24,
+    fontSize: width * 0.06, // Dinamik font boyutu
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: height * 0.01, // Dinamik margin
   },
   section: {
-    marginBottom: 24,
+    marginBottom: height * 0.02, // Dinamik margin
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: width * 0.04, // Dinamik font boyutu
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: height * 0.009,
     color: '#333',
   },
   option: {
     backgroundColor: '#fff',
-    padding: 16,
+    padding: width * 0.025, // Dinamik padding
     borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: height * 0.01, // Dinamik spacing
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
@@ -107,7 +135,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   optionText: {
-    fontSize: 16,
+    fontSize: width * 0.042, // Dinamik font boyutu
     color: '#333',
   },
   optionWithSwitch: {
@@ -115,9 +143,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: width * 0.025, // Dinamik padding
     borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: height * 0.012, // Dinamik spacing
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,

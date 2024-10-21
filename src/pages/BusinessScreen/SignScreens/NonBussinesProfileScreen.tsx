@@ -7,11 +7,14 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'react-native-image-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
+
+const {width, height} = Dimensions.get('window'); // Ekran genişliği ve yüksekliğini alın
 
 const NonBussinesProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -73,7 +76,7 @@ const NonBussinesProfileScreen: React.FC = () => {
       {/* Profile Header */}
       <Text style={styles.profileTitle}>Profil</Text>
       <TouchableOpacity style={styles.editIcon}>
-        <Ionicons name="pencil" size={24} color="#007BFF" />
+        <Ionicons name="pencil" size={normalize(24)} color="#007BFF" />
       </TouchableOpacity>
       <Image
         source={{
@@ -88,7 +91,7 @@ const NonBussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handleProfileImageUpdate}>
-          <Ionicons name="camera" size={20} color="#000" />
+          <Ionicons name="camera" size={normalize(20)} color="#000" />
           <Text style={styles.actionButtonText}>Profil Resmini Güncelle</Text>
           <Text style={styles.updateButton}>Güncelle</Text>
         </TouchableOpacity>
@@ -96,7 +99,7 @@ const NonBussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handlePriceListUpdate}>
-          <Ionicons name="cash" size={20} color="#000" />
+          <Ionicons name="cash" size={normalize(20)} color="#000" />
           <Text style={styles.actionButtonText}>Fiyat Listesini Güncelle</Text>
           <Text style={styles.updateButton}>Düzenle</Text>
         </TouchableOpacity>
@@ -104,98 +107,94 @@ const NonBussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handlePastProjectsUpdate}>
-          <Ionicons name="time" size={20} color="#000" />
+          <Ionicons name="time" size={normalize(20)} color="#000" />
           <Text style={styles.actionButtonText}>Geçmiş İşler</Text>
           <Text style={styles.updateButton}>Düzenle</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Projects List */}
-      <FlatList
-        data={projects}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderProject}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.projectsContainer}
-      />
     </View>
   );
+};
+
+// Dinamik boyutlandırma için normalize fonksiyonu
+const normalize = (size: number) => {
+  const scale = width / 375; // 375, temel ekran genişliği (iPhone X gibi) olarak alınmıştır
+  return Math.round(size * scale);
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: width * 0.04, // Dinamik padding
     backgroundColor: '#fff',
   },
   profileTitle: {
-    fontSize: 18,
+    fontSize: normalize(18),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: height * 0.02, // Dinamik margin
   },
   editIcon: {
     position: 'absolute',
-    top: 16,
-    right: 16,
+    top: height * 0.02, // Dinamik top margin
+    right: width * 0.04, // Dinamik right margin
   },
   profileImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 9999,
-    marginTop: 16,
+    width: width * 0.5, // Ekran genişliğinin yarısı kadar
+    height: width * 0.5, // Kare olması için aynı genişlik
+    borderRadius: (width * 0.5) / 2, // Tam yuvarlak hale getirir
+    marginTop: height * 0.02,
     alignSelf: 'center',
   },
   profileName: {
-    fontSize: 20,
+    fontSize: normalize(20),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 16,
+    marginVertical: height * 0.02, // Dinamik dikey boşluk
   },
   actionButtonContainer: {
-    marginVertical: 8,
+    marginVertical: height * 0.02, // Dinamik dikey boşluk
   },
   actionButton: {
     backgroundColor: '#f1f1f1',
-    padding: 16,
+    padding: height * 0.02, // Dinamik padding
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: height * 0.01, // Dinamik margin
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: 'bold',
   },
   updateButton: {
-    color: '#007BFF',
+    color: '#F36117',
     fontWeight: 'bold',
   },
   projectsContainer: {
-    marginTop: 16,
+    marginTop: height * 0.02, // Dinamik üst boşluk
   },
   projectCard: {
-    width: 150,
-    padding: 8,
+    width: width * 0.4, // Ekranın %40'ı genişliğinde
+    padding: height * 0.02, // Dinamik padding
     borderRadius: 8,
     backgroundColor: '#f8f8f8',
-    marginRight: 16,
+    marginRight: width * 0.04, // Dinamik sağ boşluk
     alignItems: 'center',
   },
   projectImage: {
     width: '100%',
-    height: 100,
+    height: height * 0.15, // Dinamik yükseklik
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: height * 0.01, // Dinamik margin
   },
   projectName: {
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: height * 0.01, // Dinamik margin
   },
   projectDescription: {
-    fontSize: 12,
+    fontSize: normalize(12),
     color: '#666',
   },
 });

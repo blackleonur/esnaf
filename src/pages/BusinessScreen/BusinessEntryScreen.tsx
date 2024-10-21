@@ -40,21 +40,41 @@ const BusinessEntryScreen = (navigation: goBentryprop) => {
           </Text>
         </View>
         <View style={BussinesEntryStyle.ButtonContainer}>
-          <TouchableOpacity
-            style={BussinesEntryStyle.Button}
-            onPress={goBentry}>
-            <Text style={BussinesEntryStyle.ButtonText}>Giriş Yap</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={BussinesEntryStyle.Button}
-            onPress={goRegistery}>
-            <Text style={BussinesEntryStyle.ButtonText}>Kayıt Ol</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={BussinesEntryStyle.Button}
-            onPress={goNonBussines}>
-            <Text style={BussinesEntryStyle.ButtonText}>Dükkanım Yok</Text>
-          </TouchableOpacity>
+          <LinearGradient
+            colors={['#F36117', '#0a040a']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            style={BussinesEntryStyle.Linear}>
+            <TouchableOpacity
+              style={BussinesEntryStyle.Button}
+              onPress={goBentry}>
+              <Text style={BussinesEntryStyle.ButtonText}>Giriş Yap</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+          <View></View>
+          <LinearGradient
+            colors={['#F36117', '#0a040a']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            style={BussinesEntryStyle.Linear}>
+            <TouchableOpacity
+              style={BussinesEntryStyle.Button}
+              onPress={goRegistery}>
+              <Text style={BussinesEntryStyle.ButtonText}>Kayıt Ol</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+          <View></View>
+          <LinearGradient
+            colors={['#F36117', '#0a040a']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            style={BussinesEntryStyle.Linear}>
+            <TouchableOpacity
+              style={BussinesEntryStyle.Button}
+              onPress={goNonBussines}>
+              <Text style={BussinesEntryStyle.ButtonText}>Dükkanım Yok</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
       </View>
     </LinearGradient>

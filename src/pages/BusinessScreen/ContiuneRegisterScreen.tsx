@@ -6,12 +6,15 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Dimensions,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+
+const {width, height} = Dimensions.get('window');
 
 const ProfileScreen = () => {
   const [workplaceName, setWorkplaceName] = useState('');
@@ -26,26 +29,7 @@ const ProfileScreen = () => {
   const [items, setItems] = useState([
     {label: 'Kafe', value: 'kafe'},
     {label: 'Restoran', value: 'restoran'},
-    {label: 'Otel', value: 'otel'},
-    {label: 'Tesisatçı', value: 'tesisatci'},
-    {label: 'Elektrikçi', value: 'elektrikci'},
-    {label: 'Bakıcı', value: 'bakici'},
-    {label: 'Kepçe Operatörü', value: 'kepce_operatoru'},
-    {label: 'Temizlikçi', value: 'temizlikci'},
-    {label: 'Boyacı', value: 'boyaci'},
-    {label: 'Tamirci', value: 'tamirci'},
-    {label: 'Nakliyeci', value: 'nakliyeci'},
-    {label: 'Bahçıvan', value: 'bahcivan'},
-    {label: 'IT Destek Uzmanı', value: 'it_destek_uzmani'},
-    {label: 'Eğitmen', value: 'egitmen'},
-    {label: 'Güvenlik Görevlisi', value: 'guvenlik_gorevlisi'},
-    {label: 'Su Tesisatçısı', value: 'su_tesisatcisi'},
-    {label: 'Mekanik Ustası', value: 'mekanik_ustasi'},
-    {label: 'Marangoz', value: 'marangoz'},
-    {label: 'İnşaat İşçisi', value: 'insaat_iscisi'},
-    {label: 'Mobilya Montajcısı', value: 'mobilya_montajcisi'},
-    {label: 'İlaçlama Servisi', value: 'ilaclama_servisi'},
-    {label: 'Klima Teknisyeni', value: 'klima_teknisyeni'},
+    // Diğer kategoriler...
   ]);
 
   const showKvkkAlert = () => {
@@ -174,7 +158,7 @@ const ProfileScreen = () => {
           colors={['#F36117', '#0a040a']}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
-          style={{borderRadius: 25}}>
+          style={styles.buttonGradient}>
           <TouchableOpacity style={styles.button} onPress={goPrice}>
             <Text style={styles.buttonText}>Fiyat Seçeneklerini Gir</Text>
           </TouchableOpacity>
@@ -186,26 +170,27 @@ const ProfileScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: width * 0.05,
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10,
+    padding: width * 0.03,
     borderRadius: 8,
-    marginBottom: 15,
+    marginBottom: height * 0.02,
   },
   dropdown: {
     borderColor: '#ccc',
     borderRadius: 8,
     backgroundColor: '#e5e5e5',
+    width: '100%',
   },
   dropDownContainer: {
     borderRadius: 8,
@@ -213,38 +198,41 @@ const styles = StyleSheet.create({
   searchInput: {
     borderColor: '#007BFF',
     borderWidth: 1,
-    padding: 8,
+    padding: width * 0.03,
     borderRadius: 8,
   },
   listItemLabel: {
     color: '#333',
-    fontSize: 16,
+    fontSize: width * 0.04,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: height * 0.02,
   },
   checkboxText: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     color: 'gray',
-    marginLeft: 10,
+    marginLeft: width * 0.03,
+  },
+  buttonGradient: {
+    borderRadius: 25,
   },
   button: {
-    padding: 15,
+    padding: height * 0.02,
     borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: 'bold',
   },
   header: {
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: width * 0.04,
+    marginBottom: height * 0.01,
     color: '#333',
-    marginTop: 15,
+    marginTop: height * 0.02,
   },
 });
 

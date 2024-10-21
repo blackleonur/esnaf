@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
-
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckBox from '@react-native-community/checkbox';
 import styles from './Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios';
 
 interface RegisterScreenProps {
   navigation: NavigationProp<any, any>;
@@ -16,38 +16,31 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
   const [surname, setSurname] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [addres, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptKVKK, setAcceptKVKK] = useState(false);
 
-  // E-posta doğrulama regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  // Şifre doğrulama regex (bir harf ve bir rakam bulunmalı)
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
-  // Kayıt Ol butonuna basıldığında çalışacak fonksiyon
-  const handleRegister = () => {
-    // Boş alanların kontrolü
+  const handleRegister = async () => {
     if (!name || !surname || !email || !phone || !password) {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurun.');
       return;
     }
 
-    // Telefon numarasının 10 haneli olup olmadığını kontrol et
     if (phone.length !== 10) {
-      Alert.alert('Hata', 'Telefon numaranızı eksik yada hatalı tuşladınız.');
+      Alert.alert('Hata', 'Telefon numaranızı eksik ya da hatalı tuşladınız.');
       return;
     }
 
-    // E-posta formatının doğru olup olmadığını kontrol et
     if (!emailRegex.test(email)) {
       Alert.alert('Hata', 'Lütfen geçerli bir e-posta adresi giriniz.');
       return;
     }
 
-    // Şifrede bir harf ve bir rakam olup olmadığını kontrol et
     if (!passwordRegex.test(password)) {
       Alert.alert(
         'Hata',
@@ -56,7 +49,6 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
       return;
     }
 
-    // Checkbox'ların işaretli olup olmadığını kontrol et
     if (!acceptTerms || !acceptKVKK) {
       Alert.alert(
         'Hata',
@@ -65,14 +57,43 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
       return;
     }
 
-    navigation.navigation.navigate('VerificationScreen');
+    const userData = {
+      firstName: name,
+      lastName: surname,
+      email: email,
+      phone: phone,
+      password: password,
+      adress: addres,
+    };
+
+    try {
+      const response = await axios.post(
+        'http://10.0.2.2:5150/api/User/Register',
+        userData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        Alert.alert('Başarılı', 'Kayıt başarılı!');
+        navigation.navigation.navigate('VerificationScreen');
+      } else {
+        Alert.alert('Hata', 'Kayıt sırasında bir hata oluştu.');
+      }
+    } catch (error) {
+      Alert.alert('Hata', 'Kayıt işlemi başarısız oldu.');
+      console.error(error);
+    }
   };
 
   const handleTermsPress = () => {
     Alert.alert('Kullanım Şartları', 'Burada kullanım şartları yer alacak...', [
       {
         text: 'Okudum, Anladım, Kabul Ediyorum',
-        onPress: () => setAcceptTerms(true), // Butona basınca Kullanım Şartlarını kabul et
+        onPress: () => setAcceptTerms(true),
       },
       {
         text: 'Vazgeç',
@@ -85,7 +106,7 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
     Alert.alert('KVKK Metni', 'Burada KVKK metni yer alacak...', [
       {
         text: 'Okudum, Anladım, Kabul Ediyorum',
-        onPress: () => setAcceptKVKK(true), // Butona basınca KVKK metnini kabul et
+        onPress: () => setAcceptKVKK(true),
       },
       {
         text: 'Vazgeç',
@@ -103,7 +124,6 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
       <View style={styles.container}>
         <Text style={styles.header}>Kayıt Ol</Text>
 
-        {/* Ad */}
         <Text style={styles.label}>Ad</Text>
         <TextInput
           style={styles.input}
@@ -112,7 +132,6 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
           onChangeText={setName}
         />
 
-        {/* Soyad */}
         <Text style={styles.label}>Soyad</Text>
         <TextInput
           style={styles.input}
@@ -121,7 +140,6 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
           onChangeText={setSurname}
         />
 
-        {/* E-posta */}
         <Text style={styles.label}>E-posta</Text>
         <TextInput
           style={styles.input}
@@ -131,7 +149,14 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
           keyboardType="email-address"
         />
 
-        {/* Telefon */}
+        <Text style={styles.label}>Adres</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Adresinizi girin"
+          value={addres}
+          onChangeText={setAddress}
+        />
+
         <Text style={styles.label}>Telefon</Text>
         <View style={styles.phoneContainer}>
           <TouchableOpacity style={styles.countryCode}>
@@ -148,11 +173,10 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
               }
             }}
             keyboardType="phone-pad"
-            maxLength={10} // Telefon numarasını 10 hane ile sınırlandır
+            maxLength={10}
           />
         </View>
 
-        {/* Şifre */}
         <Text style={styles.label}>Şifre</Text>
         <View style={styles.passwordContainer}>
           <TextInput
@@ -169,12 +193,11 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
           </TouchableOpacity>
         </View>
 
-        {/* Şartlar ve KVKK onay kutuları */}
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={acceptTerms}
-            onValueChange={() => {}} // Kullanıcı elle değiştiremesin
-            disabled={!acceptTerms} // Butona basmadan checkbox pasif kalsın
+            onValueChange={() => {}}
+            disabled={!acceptTerms}
           />
           <TouchableOpacity onPress={handleTermsPress}>
             <Text style={styles.checkboxText}>
@@ -186,8 +209,8 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={acceptKVKK}
-            onValueChange={() => {}} // Kullanıcı elle değiştiremesin
-            disabled={!acceptKVKK} // Butona basmadan checkbox pasif kalsın
+            onValueChange={() => {}}
+            disabled={!acceptKVKK}
           />
           <TouchableOpacity onPress={handleKVKKPress}>
             <Text style={styles.checkboxText}>
@@ -196,7 +219,6 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
           </TouchableOpacity>
         </View>
 
-        {/* Kayıt Ol butonu */}
         <LinearGradient
           colors={['#F36117', '#0a040a']}
           start={{x: 0, y: 0}}

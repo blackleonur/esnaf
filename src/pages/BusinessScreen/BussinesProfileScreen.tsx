@@ -7,11 +7,20 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  Dimensions,
+  PixelRatio,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'react-native-image-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
+
+// Ekran genişliği ve yüksekliği
+const {width, height} = Dimensions.get('window');
+
+// Dinamik boyutlar için ölçekleme fonksiyonları
+const scale = (size: number) => (width / 375) * size;
+const normalizeFont = (size: number) => size * PixelRatio.getFontScale();
 
 const BussinesProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -73,7 +82,7 @@ const BussinesProfileScreen: React.FC = () => {
       {/* Profile Header */}
       <Text style={styles.profileTitle}>Profil</Text>
       <TouchableOpacity style={styles.editIcon}>
-        <Ionicons name="pencil" size={24} color="#007BFF" />
+        <Ionicons name="pencil" size={scale(24)} color="#007BFF" />
       </TouchableOpacity>
       <Image
         source={{
@@ -88,7 +97,7 @@ const BussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handleProfileImageUpdate}>
-          <Ionicons name="camera" size={20} color="#000" />
+          <Ionicons name="camera" size={scale(20)} color="#000" />
           <Text style={styles.actionButtonText}>Profil Resmini Güncelle</Text>
           <Text style={styles.updateButton}>Güncelle</Text>
         </TouchableOpacity>
@@ -96,7 +105,7 @@ const BussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handlePriceListUpdate}>
-          <Ionicons name="cash" size={20} color="#000" />
+          <Ionicons name="cash" size={scale(20)} color="#000" />
           <Text style={styles.actionButtonText}>Fiyat Listesini Güncelle</Text>
           <Text style={styles.updateButton}>Düzenle</Text>
         </TouchableOpacity>
@@ -104,7 +113,7 @@ const BussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handleAddressUpdate}>
-          <Ionicons name="location" size={20} color="#000" />
+          <Ionicons name="location" size={scale(20)} color="#000" />
           <Text style={styles.actionButtonText}>Adres ve Dükkan İsmi</Text>
           <Text style={styles.updateButton}>Düzenle</Text>
         </TouchableOpacity>
@@ -112,21 +121,11 @@ const BussinesProfileScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handlePastProjectsUpdate}>
-          <Ionicons name="time" size={20} color="#000" />
+          <Ionicons name="time" size={scale(20)} color="#000" />
           <Text style={styles.actionButtonText}>Geçmiş İşler</Text>
           <Text style={styles.updateButton}>Düzenle</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Projects List */}
-      <FlatList
-        data={projects}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderProject}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.projectsContainer}
-      />
     </View>
   );
 };
@@ -134,75 +133,75 @@ const BussinesProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: scale(16),
     backgroundColor: '#fff',
   },
   profileTitle: {
-    fontSize: 18,
+    fontSize: normalizeFont(18),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: scale(16),
   },
   editIcon: {
     position: 'absolute',
-    top: 16,
-    right: 16,
+    top: scale(16),
+    right: scale(16),
   },
   profileImage: {
     width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginTop: 16,
+    height: scale(100),
+    borderRadius: scale(8),
+    marginTop: scale(16),
   },
   profileName: {
-    fontSize: 20,
+    fontSize: normalizeFont(20),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 16,
+    marginVertical: scale(16),
   },
   actionButtonContainer: {
-    marginVertical: 8,
+    marginVertical: scale(8),
   },
   actionButton: {
     backgroundColor: '#f1f1f1',
-    padding: 16,
-    borderRadius: 8,
+    padding: scale(16),
+    borderRadius: scale(8),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: scale(8),
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: normalizeFont(16),
     fontWeight: 'bold',
   },
   updateButton: {
-    color: '#007BFF',
+    color: '#F36117',
     fontWeight: 'bold',
   },
   projectsContainer: {
-    marginTop: 16,
+    marginTop: scale(16),
   },
   projectCard: {
-    width: 150,
-    padding: 8,
-    borderRadius: 8,
+    width: scale(150),
+    padding: scale(8),
+    borderRadius: scale(8),
     backgroundColor: '#f8f8f8',
-    marginRight: 16,
+    marginRight: scale(16),
     alignItems: 'center',
   },
   projectImage: {
     width: '100%',
-    height: 100,
-    borderRadius: 8,
-    marginBottom: 8,
+    height: scale(100),
+    borderRadius: scale(8),
+    marginBottom: scale(8),
   },
   projectName: {
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: scale(4),
   },
   projectDescription: {
-    fontSize: 12,
+    fontSize: normalizeFont(12),
     color: '#666',
   },
 });

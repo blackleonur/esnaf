@@ -21,7 +21,7 @@ const SeparatorWithText: React.FC<SeperatorText> = ({text = 'VEYA'}) => {
   return (
     <View style={BEntryStyle.separatorContainer}>
       <View style={BEntryStyle.line} />
-      <Text style={BEntryStyle.text}>{text}</Text>
+      <Text>{text}</Text>
       <View style={BEntryStyle.line} />
     </View>
   );
@@ -39,7 +39,7 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
   function Entry() {
     if (mail !== '' && password !== '') {
       // Mail ve şifre doluysa FindScreen'e yönlendir
-      navigation.navigation.navigate('FindScreen');
+      navigation.navigation.navigate('NonBusinessHomeScreen');
     } else {
       // Hata durumu için bir uyarı verebilirsiniz
       Alert.alert('Lütfen mail ve şifre alanlarını doldurunuz.');

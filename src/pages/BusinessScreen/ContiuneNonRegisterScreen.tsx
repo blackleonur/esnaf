@@ -6,12 +6,22 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Dimensions,
+  PixelRatio,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+
+const {width, height} = Dimensions.get('window');
+
+// Dinamik boyutlar için yardımcı fonksiyonlar
+const scale = width / 320;
+const normalize = (size: number) =>
+  Math.round(PixelRatio.roundToNearestPixel(size * scale));
+
 const ContiuneNonRegisterScreen = () => {
   const [workplaceName, setWorkplaceName] = useState('');
   const [address, setAddress] = useState('');
@@ -96,7 +106,7 @@ const ContiuneNonRegisterScreen = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Profilinizi Doldurun</Text>
 
-        <Text>İş Kategorisi</Text>
+        <Text style={styles.label}>İş Kategorisi</Text>
         <DropDownPicker
           open={open}
           value={value}
@@ -110,15 +120,9 @@ const ContiuneNonRegisterScreen = () => {
           searchTextInputStyle={styles.searchInput}
           listItemLabelStyle={styles.listItemLabel}
           dropDownContainerStyle={styles.dropDownContainer}
-          ArrowUpIconComponent={({style}) => (
-            <Text style={[style, {fontSize: 20}]}>▲</Text>
-          )}
-          ArrowDownIconComponent={({style}) => (
-            <Text style={[style, {fontSize: 20}]}>▼</Text>
-          )}
         />
 
-        <Text>Tc Kimlik Numarası</Text>
+        <Text style={styles.label}>Tc Kimlik Numarası</Text>
         <TextInput
           style={styles.input}
           value={taxNumber}
@@ -152,6 +156,7 @@ const ContiuneNonRegisterScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
+
         <LinearGradient
           colors={['#F36117', '#0a040a']}
           start={{x: 0, y: 0}}
@@ -168,60 +173,64 @@ const ContiuneNonRegisterScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: normalize(20),
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: normalize(24),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: normalize(20),
+  },
+  label: {
+    fontSize: normalize(16),
+    marginBottom: normalize(5),
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 15,
+    padding: normalize(10),
+    borderRadius: normalize(8),
+    marginBottom: normalize(15),
   },
   dropdown: {
     backgroundColor: '#fafafa',
     borderColor: '#ccc',
-    borderRadius: 8,
+    borderRadius: normalize(8),
   },
   dropDownContainer: {
     backgroundColor: '#ffffff',
     borderColor: '#ccc',
-    borderRadius: 8,
+    borderRadius: normalize(8),
   },
   searchInput: {
     borderColor: '#007BFF',
     borderWidth: 1,
-    padding: 8,
-    borderRadius: 8,
+    padding: normalize(8),
+    borderRadius: normalize(8),
   },
   listItemLabel: {
     color: '#333',
-    fontSize: 16,
+    fontSize: normalize(16),
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: normalize(15),
   },
   checkboxText: {
-    fontSize: 16,
+    fontSize: normalize(16),
     color: 'gray',
-    marginLeft: 10,
+    marginLeft: normalize(10),
   },
   button: {
-    padding: 15,
-    borderRadius: 8,
+    padding: normalize(15),
+    borderRadius: normalize(8),
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: 'bold',
   },
 });

@@ -10,10 +10,15 @@ import {
   Switch,
   KeyboardAvoidingView,
   Platform,
+  Dimensions,
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
+const {width, height} = Dimensions.get('window');
+
 type RootStackParamList = {
   BussinesHomeScreen: undefined;
 };
@@ -26,38 +31,12 @@ interface PricingItem {
   enabled: boolean;
 }
 
-interface PriceEntryScreenProps {}
-
-const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
+const PriceEntryScreen: React.FC = () => {
   const [pricingData, setPricingData] = useState<PricingItem[]>([
-    {
-      id: '1',
-      label: 'Metrekare ücreti',
-      value: 10,
-      unit: 'TL',
-      enabled: true,
-    },
-    {
-      id: '2',
-      label: 'Koltuk ücreti',
-      value: 15,
-      unit: 'TL',
-      enabled: true,
-    },
-    {
-      id: '3',
-      label: 'Overlok ücreti',
-      value: 20,
-      unit: 'TL',
-      enabled: true,
-    },
-    {
-      id: '4',
-      label: 'Yorgan ücreti',
-      value: 20,
-      unit: 'TL',
-      enabled: true,
-    },
+    {id: '1', label: 'Metrekare ücreti', value: 10, unit: 'TL', enabled: true},
+    {id: '2', label: 'Koltuk ücreti', value: 15, unit: 'TL', enabled: true},
+    {id: '3', label: 'Overlok ücreti', value: 20, unit: 'TL', enabled: true},
+    {id: '4', label: 'Yorgan ücreti', value: 20, unit: 'TL', enabled: true},
     {
       id: '5',
       label: 'Taşpınar halı m2 ücreti',
@@ -65,27 +44,13 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
       unit: 'TL',
       enabled: true,
     },
-    {
-      id: '6',
-      label: 'Battaniye',
-      value: 20,
-      unit: 'TL',
-      enabled: true,
-    },
-    {
-      id: '7',
-      label: 'Koltuk',
-      value: 20,
-      unit: 'TL',
-      enabled: true,
-    },
+    {id: '6', label: 'Battaniye', value: 20, unit: 'TL', enabled: true},
+    {id: '7', label: 'Koltuk', value: 20, unit: 'TL', enabled: true},
   ]);
 
   const [newServiceLabel, setNewServiceLabel] = useState('');
 
-  // "Kaydet" butonuna tıklandığında verileri güncelleme fonksiyonu
   const handleSave = () => {
-    // Eğer bir yeni hizmet eklenmişse, onu da pricingData'ya ekliyoruz
     if (newServiceLabel.trim()) {
       const newService: PricingItem = {
         id: Math.random().toString(),
@@ -95,10 +60,8 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
         enabled: true,
       };
       setPricingData([...pricingData, newService]);
-      setNewServiceLabel(''); // Yeni hizmet label'ını sıfırlıyoruz
+      setNewServiceLabel('');
     }
-
-    // Kaydedilen veriyi işleyebilirsiniz (örn: bir API'ye gönderme)
     console.log('Güncellenmiş Veriler:', pricingData);
     Alert.alert('Başarılı', 'Veriler başarıyla kaydedildi!');
   };
@@ -154,7 +117,7 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
             colors={['#F36117', '#0a040a']}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
-            style={{borderRadius: 25}}>
+            style={styles.gradientButton}>
             <TouchableOpacity
               style={styles.button}
               onPress={() => handleDecrement(item.id)}>
@@ -171,7 +134,7 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
             colors={['#F36117', '#0a040a']}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
-            style={{borderRadius: 25}}>
+            style={styles.gradientButton}>
             <TouchableOpacity
               style={styles.button}
               onPress={() => handleIncrement(item.id)}>
@@ -184,58 +147,48 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
     </View>
   );
 
-  interface goHomeProp {
-    navigation: NavigationProp<any, any>;
-  }
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   function goHome() {
     navigation.navigate('BussinesHomeScreen');
   }
 
   return (
-    <LinearGradient
-      colors={['#FFFFFF', '#A6A6A6']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={{flex: 1}}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Text style={styles.title}>Fiyat Seçenekleri</Text>
-        <Text style={styles.subtitle}>
-          Lütfen size uygun fiyat seçeneklerini seçin.
-        </Text>
-
-        <Text style={styles.serviceHeader}>Hizmetler</Text>
-
-        <FlatList
-          data={pricingData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          style={{maxHeight: 650}}
-        />
-
-        <View style={styles.newServiceContainer}>
-          <TextInput
-            style={styles.newServiceInput}
-            placeholder="Yeni hizmet ekle"
-            value={newServiceLabel}
-            onChangeText={setNewServiceLabel}
+    <LinearGradient colors={['#FFFFFF', '#A6A6A6']} style={{flex: 1}}>
+      <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <Text style={styles.title}>Fiyat Seçenekleri</Text>
+          <Text style={styles.subtitle}>
+            Lütfen size uygun fiyat seçeneklerini seçin.
+          </Text>
+          <FlatList
+            data={pricingData}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            style={{maxHeight: height * 0.7}}
           />
-          <TouchableOpacity style={styles.addButton} onPress={handleSave}>
-            <Text style={styles.buttonText}>Ekle ve Kaydet</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.cancelButton}>
-            <Text style={styles.buttonText}>İptal</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.saveButton} onPress={goHome}>
-            <Text style={styles.buttonText}>Kaydet</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+          <View style={styles.newServiceContainer}>
+            <TextInput
+              style={styles.newServiceInput}
+              placeholder="Yeni hizmet ekle"
+              value={newServiceLabel}
+              onChangeText={setNewServiceLabel}
+            />
+            <TouchableOpacity style={styles.addButton} onPress={handleSave}>
+              <Text style={styles.buttonText}>Ekle ve Kaydet</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.cancelButton}>
+              <Text style={styles.buttonText}>İptal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveButton} onPress={goHome}>
+              <Text style={styles.buttonText}>Kaydet</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </LinearGradient>
   );
 };
@@ -243,35 +196,31 @@ const PriceEntryScreen: React.FC<PriceEntryScreenProps> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: width * 0.005,
+    paddingTop: height * 0.02,
   },
   title: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: height * 0.02,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     textAlign: 'center',
-    marginBottom: 20,
-  },
-  serviceHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: height * 0.02,
   },
   priceContainer: {
-    marginBottom: 20,
+    marginBottom: height * 0.02,
   },
   labelContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: height * 0.01,
   },
   label: {
-    fontSize: 16,
+    fontSize: width * 0.04,
   },
   controls: {
     flexDirection: 'row',
@@ -281,65 +230,60 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: 'gray',
-    padding: 12,
-    borderRadius: 25,
+    padding: height * 0.015,
+    borderRadius: width * 0.05,
     textAlign: 'center',
-    width: 70,
+    width: width * 0.15,
   },
   unit: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#333',
+    marginLeft: width * 0.02,
+    fontSize: width * 0.04,
   },
   button: {
-    padding: 12,
+    padding: height * 0.015,
     borderRadius: 5,
-    marginHorizontal: 10,
+    marginHorizontal: width * 0.02,
+  },
+  gradientButton: {
+    borderRadius: 5,
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
-    padding: 5,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  cancelButton: {
-    backgroundColor: 'red',
-    padding: 15,
-    borderRadius: 8,
-    flex: 1,
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  saveButton: {
-    backgroundColor: 'blue',
-    padding: 15,
-    borderRadius: 8,
-    flex: 1,
-    marginLeft: 10,
-    alignItems: 'center',
+    fontSize: width * 0.05,
   },
   newServiceContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: height * 0.02,
   },
   newServiceInput: {
     flex: 1,
     borderWidth: 1,
     borderColor: 'gray',
-    padding: 10,
     borderRadius: 5,
-    textAlign: 'center',
+    padding: height * 0.015,
+    marginRight: width * 0.02,
   },
   addButton: {
-    backgroundColor: '#28a745',
-    padding: 10,
+    padding: height * 0.015,
+    backgroundColor: '#F36117',
     borderRadius: 5,
-    marginLeft: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: height * 0.02,
+  },
+  cancelButton: {
+    padding: height * 0.015,
+    backgroundColor: 'gray',
+    borderRadius: 5,
+  },
+  saveButton: {
+    padding: height * 0.015,
+    backgroundColor: '#F36117',
+    borderRadius: 5,
   },
 });
 

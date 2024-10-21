@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
@@ -16,6 +17,8 @@ interface Campaign {
   discount: string;
   imageUri: string;
 }
+
+const {width, height} = Dimensions.get('window');
 
 const BussinesCampaignScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -32,8 +35,8 @@ const BussinesCampaignScreen: React.FC = () => {
       discount: '%30 indirim',
       imageUri: 'https://example.com/image2.jpg',
     },
-    // Diğer kampanyalar buraya eklenebilir
   ]);
+
   const goAddCampaign = () => {
     navigation.navigate('AddCampaignScreen');
   };
@@ -75,13 +78,13 @@ const BussinesCampaignScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: width * 0.04, // Dinamik padding
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 18,
+    fontSize: width * 0.05, // Dinamik font boyutu
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: height * 0.02,
   },
   list: {
     flexGrow: 0,
@@ -89,33 +92,33 @@ const styles = StyleSheet.create({
   campaignCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
+    padding: width * 0.04,
+    marginVertical: height * 0.01,
+    borderRadius: width * 0.02,
     backgroundColor: '#f1f1f1',
   },
   campaignImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 16,
+    width: width * 0.15, // Dinamik genişlik ve yükseklik
+    height: width * 0.15,
+    borderRadius: width * 0.02,
+    marginRight: width * 0.04,
   },
   campaignInfo: {
     flex: 1,
   },
   campaignTitle: {
-    fontSize: 16,
+    fontSize: width * 0.045, // Dinamik font boyutu
     fontWeight: 'bold',
   },
   campaignDiscount: {
-    fontSize: 14,
+    fontSize: width * 0.04,
     color: '#666',
   },
   editButton: {
     backgroundColor: '#007BFF',
-    padding: 8,
-    borderRadius: 4,
-    marginTop: 8,
+    padding: width * 0.03,
+    borderRadius: width * 0.02,
+    marginTop: height * 0.01,
   },
   editButtonText: {
     color: '#fff',
@@ -124,15 +127,15 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#28a745',
-    padding: 16,
-    borderRadius: 8,
+    padding: width * 0.04,
+    borderRadius: width * 0.03,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: height * 0.02,
   },
   addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: width * 0.045, // Dinamik font boyutu
   },
 });
 

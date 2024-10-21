@@ -1,75 +1,95 @@
-import {cloneElement} from 'react';
-import {StyleSheet} from 'react-native';
-const BEntryStyle = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#FFFFFF'},
-  HeaderContainer: {marginLeft: 6, marginRight: 6, marginTop: 45},
-  HeaderText: {fontSize: 24, color: 'black', marginBottom: 9, marginTop: 9},
-  Text: {
-    fontSize: 17,
-    fontWeight: '400',
-    borderWidth: 1,
-    borderRadius: 9,
-    paddingLeft: 7,
-    alignContent: 'center',
-  },
-  ButtonContainer: {marginLeft: 5, marginRight: 5},
-  Button: {
-    paddingBottom: 10,
-    paddingTop: 10,
+import {StyleSheet, Dimensions} from 'react-native';
 
-    margin: 7,
+const {width, height} = Dimensions.get('window');
+
+const CustomerEntryStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: width * 0.04, // Ekranın genişliğine göre dinamik padding
+  },
+  HeaderContainer: {
+    marginTop: height * 0.01, // Dinamik margin top
+    flex: 1,
+  },
+  HeaderText: {
+    fontSize: width * 0.045, // Dinamik font boyutu
+    fontWeight: 'bold',
+    marginBottom: height * 0.01,
+    marginTop: height * 0.01,
+  },
+  Text: {
+    fontSize: width * 0.04, // Dinamik font boyutu
+    fontWeight: '400',
+    borderWidth: 0.4,
+    borderRadius: width * 0.03, // Dinamik border-radius
+    paddingLeft: width * 0.02, // Dinamik padding left
+    alignContent: 'center',
+    height: height * 0.06, // Dinamik height (düğme veya input boyutu)
+  },
+  ButtonContainer: {
+    marginTop: height * 0.25, // Dinamik margin top
+    flex: 1,
+  },
+  Button: {
+    paddingVertical: height * 0.02, // Dinamik padding vertical
+    borderRadius: width * 0.06, // Dinamik border-radius
   },
   buttonImage: {
-    width: 25,
-    height: 25,
-    marginRight: 115,
-    marginLeft: 12,
+    width: width * 0.05, // Dinamik resim boyutu
+    height: width * 0.05,
+    marginRight: width * 0.3, // Dinamik margin right
+    marginLeft: width * 0.03, // Dinamik margin left
   },
-  ButtonText: {color: '#fff', fontSize: 18},
-  Image: {width: 175, height: 175, alignSelf: 'center', marginTop: 25},
+  ButtonText: {
+    fontWeight: '700',
+    fontSize: width * 0.04, // Dinamik font boyutu
+    color: '#c9c5c9',
+  },
+  Image: {
+    width: width * 0.2, // Dinamik resim boyutu
+    height: width * 0.2,
+    alignSelf: 'center',
+    marginTop: height * 0.035, // Dinamik margin top
+  },
+  entrybuttoncontainer: {
+    marginTop: height * 0.07,
+    alignItems: 'center',
+  },
   EntryButton: {
-    paddingHorizontal: 50,
-    paddingVertical: 15,
-    alignItems: 'center', // Buton içeriğini yatayda ortalar
+    paddingVertical: height * 0.02, // Dinamik padding vertical
+    paddingHorizontal: width * 0.35, // Dinamik padding horizontal
+    borderRadius: width * 0.06, // Dinamik border-radius
+    alignItems: 'center',
   },
   separatorContainer: {
-    marginTop: 35,
+    marginTop: height * 0.07,
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
-    alignContent: 'center',
+    marginVertical: height * 0.015,
   },
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: 'gray', // Çizgi rengi
+    backgroundColor: '#C3C5C6', // Çizgi rengi
   },
-  text: {
-    marginHorizontal: 10,
-    fontSize: 16,
-    color: 'gray', // Yazı rengi
+  seperatorText: {
+    fontSize: width * 0.03, // Dinamik font boyutu
+    color: 'gray',
     alignSelf: 'center',
-    paddingLeft: 30,
-    paddingRight: 30,
+    marginHorizontal: width * 0.06, // Dinamik margin horizontal
   },
   Buttonkayit: {
-    textAlign: 'center', // Yazıyı ortalar
-    color: '#fff',
-    fontSize: 18,
+    margin: 'auto',
+    fontWeight: '700',
+    fontSize: width * 0.04, // Dinamik font boyutu
   },
-  NonMarketText: {
-    textAlign: 'center',
-    color: '#fff',
-    fontSize: 18,
-  },
-  NonMarketButton: {
-    flexDirection: 'row',
-    justifyContent: 'center', // Button içeriğini yatayda ortalar
-    paddingBottom: 10,
-    paddingTop: 10,
-    borderRadius: 5,
-    margin: 7,
+  ButtonWithSsoText: {
+    fontWeight: '700',
+    fontSize: width * 0.04, // Dinamik font boyutu
+    fontStyle: 'normal',
+    alignSelf: 'center',
+    marginRight: width * 0.25, // Dinamik margin right
   },
 });
 
-export default BEntryStyle;
+export default CustomerEntryStyle;

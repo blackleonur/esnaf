@@ -1,4 +1,3 @@
-// AddressUpdateScreen.tsx
 import React, {useState} from 'react';
 import {
   View,
@@ -7,7 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Dimensions,
 } from 'react-native';
+
+// Cihazın genişlik ve yüksekliğini alıyoruz
+const {width, height} = Dimensions.get('window');
+
+// Dinamik olarak boyutlandırma fonksiyonları
+const scale = (size: number) => (width / 375) * size; // iPhone 11 genişliği baz alındı
+const verticalScale = (size: number) => (height / 812) * size;
 
 const AddressUpdateScreen: React.FC = () => {
   const [address, setAddress] = useState('');
@@ -44,32 +51,32 @@ const AddressUpdateScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: scale(16),
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 18,
+    fontSize: scale(18),
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: verticalScale(16),
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
-    fontSize: 16,
+    borderRadius: scale(8),
+    padding: scale(10),
+    marginBottom: verticalScale(16),
+    fontSize: scale(16),
   },
   button: {
     backgroundColor: '#007BFF',
-    padding: 16,
-    borderRadius: 8,
+    padding: scale(16),
+    borderRadius: scale(8),
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: scale(16),
   },
 });
 

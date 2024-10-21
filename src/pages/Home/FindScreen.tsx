@@ -7,10 +7,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons
+
+const {width, height} = Dimensions.get('window');
 
 const categories = [
   {id: '1', name: 'Elektrikçi', image: 'https://bit.ly/47ysqZn'},
@@ -48,8 +52,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('CategoriesScreen')} // Navigate to FavsScreen when category is clicked
-    >
+      onPress={() => navigation.navigate('CategoriesScreen')}>
       <Image source={{uri: item.image}} style={styles.image} />
       <Text style={styles.cardTitle}>{item.name}</Text>
     </TouchableOpacity>
@@ -62,8 +65,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       end={{x: 1, y: 1}}
       style={{flex: 1}}>
       <View style={styles.container}>
-        {/* Arama Çubuğu */}
+        {/* Arama Çubuğu ve Görsel */}
         <View style={styles.searchContainer}>
+          <Image
+            source={require('./../../images/Logo.png')} // Görselin yolu buraya
+            style={styles.logo}
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Ne arıyorsunuz?"
@@ -74,10 +81,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
         {/* Kategori Listesi */}
         <FlatList
-          data={filteredCategories} // Filtrelenmiş listeyi göster
+          data={filteredCategories}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-          numColumns={2} // 2 sütunlu görünüm
+          numColumns={2}
           contentContainerStyle={styles.list}
         />
 
@@ -140,51 +147,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 20,
-  },
   list: {
-    paddingHorizontal: 16,
+    paddingHorizontal: width * 0.02,
   },
   card: {
     flex: 1,
-    backgroundColor: '#FFFFD9',
+    backgroundColor: '#FFFFF9',
     borderRadius: 10,
     borderColor: '#F36117',
-    margin: 8,
-    padding: 10,
+    margin: width * 0.02,
+    padding: width * 0.02,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
+    shadowOffset: {width: 0, height: 44},
+    shadowOpacity: 1,
     shadowRadius: 2,
     elevation: 2,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: width * 0.24,
+    height: width * 0.16,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: height * 0.02,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 11,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   searchContainer: {
-    margin: 20,
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
+    margin: height * 0.03,
+  },
+  logo: {
+    width: width * 0.1, // Genişliği küçük tuttum
+    height: width * 0.1,
+    marginRight: 10, // Searchbar ile arasında boşluk
   },
   searchInput: {
-    width: '90%',
-    height: 40,
+    flex: 1,
+    height: height * 0.06,
     backgroundColor: '#fff',
     borderRadius: 20,
-    paddingHorizontal: 15,
+    paddingHorizontal: width * 0.04,
     fontSize: 16,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
@@ -195,7 +202,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 10,
+    paddingVertical: height * 0.02,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderColor: '#ccc',
@@ -205,7 +212,7 @@ const styles = StyleSheet.create({
   },
   footerButtonText: {
     fontSize: 12,
-    fontWeight: 'bold', // Öne çıkan renk
+    fontWeight: 'bold',
   },
 });
 

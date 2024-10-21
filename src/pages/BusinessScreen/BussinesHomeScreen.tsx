@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NavigationProp} from '@react-navigation/native';
@@ -23,6 +24,8 @@ interface JobItem {
   uri: string;
 }
 
+const {width, height} = Dimensions.get('window');
+
 const jobData: JobItem[] = [
   {
     id: '1',
@@ -32,7 +35,6 @@ const jobData: JobItem[] = [
     address: 'Kepez, Erenköy 4819sk.',
     uri: 'https://i.pinimg.com/236x/86/ea/e3/86eae3d8abc2362ad6262916cb950640.jpg',
   },
-
   {
     id: '2',
     job: 'Kombi Değişimi',
@@ -67,6 +69,7 @@ const BusinessHomeScreen: React.FC = () => {
   const goCampaigns = () => {
     navigation.navigate('BussinesCampaignScreen');
   };
+
   const renderJobItem = ({item}: {item: JobItem}) => (
     <View style={styles.card}>
       <View style={styles.cardcontainer}>
@@ -99,11 +102,6 @@ const BusinessHomeScreen: React.FC = () => {
       <View style={styles.container}>
         <Text style={styles.shopName}>Mekan Tesisat</Text>
 
-        <Image
-          source={{uri: 'https://picsum.photos/id/237/200/300'}}
-          style={styles.workplaceImage}
-        />
-
         <Text style={styles.pendingJobsTitle}>Bekleyen İşler</Text>
         <FlatList
           data={jobData}
@@ -133,38 +131,34 @@ const BusinessHomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: width * 0.04, // %4 padding
   },
   shopName: {
-    fontSize: 24,
+    fontSize: width * 0.06, // Dinamik font boyutu
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 16,
-  },
-  workplaceImagesContainer: {
-    paddingBottom: 16,
-    marginLeft: 16, // To create the left padding for the first item
+    marginVertical: height * 0.02, // %2 margin
   },
   workplaceImage: {
-    width: 400,
-    height: 200,
-    resizeMode: 'repeat',
+    width: width * 0.9, // Ekranın %90'ı genişlik
+    height: height * 0.25, // Ekranın %25'i yükseklik
+    resizeMode: 'contain',
     borderRadius: 8,
     alignSelf: 'center',
   },
   pendingJobsTitle: {
-    fontSize: 20,
+    fontSize: width * 0.05, // Dinamik font boyutu
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: height * 0.02, // %2 margin
   },
   jobList: {
-    paddingBottom: 16,
+    paddingBottom: height * 0.02, // %2 padding
   },
   card: {
-    backgroundColor: '#FFFFD9',
-    padding: 16,
+    backgroundColor: '#FFFFF9',
+    padding: width * 0.05, // %5 padding
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: height * 0.02, // %2 margin bottom
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
@@ -176,36 +170,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   jobTitle: {
-    fontSize: 18,
+    fontSize: width * 0.045, // Dinamik font boyutu
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: height * 0.01, // %1 margin
   },
   customerName: {
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: width * 0.04, // Dinamik font boyutu
+    marginBottom: height * 0.01, // %1 margin
     alignSelf: 'center',
-    marginLeft: 90,
+    marginLeft: width * 0.1, // Ekrana göre sol boşluk
     fontWeight: 'bold',
   },
   label: {
-    fontSize: 16,
+    fontSize: width * 0.04, // Dinamik font boyutu
     flex: 1,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: height * 0.01, // %1 margin
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 8,
+    width: width * 0.15, // %15 genişlik
+    height: width * 0.15, // %15 yükseklik
+    borderRadius: (width * 0.15) / 2, // Tam yuvarlak
+    marginBottom: height * 0.01, // %1 margin
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 16,
+    paddingVertical: height * 0.02, // %2 dikey padding
     borderTopWidth: 1,
     borderColor: '#ccc',
   },
@@ -213,8 +207,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerButtonText: {
-    marginTop: 4,
-    fontSize: 14,
+    marginTop: height * 0.005, // %0.5 margin
+    fontSize: width * 0.035, // Dinamik font boyutu
     fontWeight: 'bold',
   },
 });

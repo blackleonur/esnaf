@@ -1,84 +1,79 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
+
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: width * 0.046, // Responsive padding
+    justifyContent: 'center',
   },
   header: {
-    fontSize: 24,
+    fontSize: width * 0.062, // Dynamic font size
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20,
+    marginBottom: height * 0.03,
   },
   label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#333',
+    fontSize: width * 0.034, // Dynamic font size
+    fontWeight: '600',
+    marginBottom: height * 0.01,
   },
   input: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 16,
-    marginBottom: 15,
-    borderWidth: 0.4,
-    paddingRight: 45,
+    borderWidth: 1.5,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: width * 0.01, // Dynamic padding
+    marginBottom: height * 0.012,
   },
   phoneContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: height * 0.02,
   },
   countryCode: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
-    marginRight: 10,
+    marginRight: width * 0.02,
   },
   countryCodeText: {
-    marginLeft: 5,
-    fontSize: 16,
+    fontSize: width * 0.04,
+    marginLeft: width * 0.01,
   },
   phoneInput: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: width * 0.03,
   },
   passwordContainer: {
-    marginBottom: 15,
-    position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   eyeIcon: {
     position: 'absolute',
-    right: 10, // Position it to the right inside the input
-    top: '50%', // Align vertically in the center
-    transform: [{translateY: -18}], // Adjust vertically to center the icon
+    right: 10,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: height * 0.02,
   },
   checkboxText: {
-    fontSize: 14,
-    marginLeft: 8,
-    color: 'blue',
-    textDecorationLine: 'underline', // Tıklanabilir görünüm için
+    fontSize: width * 0.032,
+    marginLeft: width * 0.02,
   },
   registerButton: {
-    paddingVertical: 15,
-    borderRadius: 8,
+    paddingVertical: height * 0.02,
     alignItems: 'center',
+    borderRadius: 25,
+    marginBottom: height * 0,
   },
   registerButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#FFF',
+    fontWeight: '600',
+    fontSize: width * 0.032,
   },
 });
 

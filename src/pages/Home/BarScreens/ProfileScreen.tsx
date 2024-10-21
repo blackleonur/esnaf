@@ -8,20 +8,19 @@ import {
   Image,
   StyleSheet,
   Alert,
+  Dimensions,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import LinearGradient from 'react-native-linear-gradient';
+
+// Ekran boyutu için dinamik ölçümler
+const {width, height} = Dimensions.get('window');
 
 // Interface tanımlamaları
 interface PersonalInfo {
   phone: string;
   email: string;
   address: string;
-}
-
-interface FavoriteItem {
-  id: string;
-  name: string;
-  imageUrl: string;
 }
 
 interface PastWorkItem {
@@ -41,40 +40,8 @@ const ProfileScreen: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<string>(
     'https://randomuser.me/api/portraits/men/4.jpg',
   );
-  // Favoriler ve Geçmiş İşler statik veri
-  const favorites: FavoriteItem[] = [
-    {
-      id: '1',
-      name: 'adnan tesisat',
-      imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-    {
-      id: '2',
-      name: 'kamil halı yıkama',
-      imageUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-    },
-    {
-      id: '3',
-      name: 'özge bayan kuaförü',
-      imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-    {
-      id: '4',
-      name: 'Marangoz sabri',
-      imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-    {
-      id: '5',
-      name: 'Özden elektrik',
-      imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-    {
-      id: '6',
-      name: 'Özlem Taşpınar "BAKICI"',
-      imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-  ];
 
+  // Geçmiş İşler statik veri
   const pastWorks: PastWorkItem[] = [
     {
       id: '1',
@@ -102,20 +69,20 @@ const ProfileScreen: React.FC = () => {
       }
     });
   };
-  const renderFavoriteItem = ({item}: {item: FavoriteItem}) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={{uri: item.imageUrl}} style={styles.image} />
-      <Text style={styles.cardText}>{item.name}</Text>
-    </TouchableOpacity>
-  );
 
   const renderPastWorkItem = ({item}: {item: PastWorkItem}) => (
     <View style={styles.pastWork}>
       <Image source={{uri: item.imageUrl}} style={styles.imageSmall} />
       <Text style={styles.pastWorkText}>{item.name}</Text>
-      <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.editButtonText}>Düzenle</Text>
-      </TouchableOpacity>
+      <LinearGradient
+        colors={['#F36117', '#0a040a']}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={{borderRadius: 25}}>
+        <TouchableOpacity style={styles.editButton}>
+          <Text style={styles.editButtonText}>Düzenle</Text>
+        </TouchableOpacity>
+      </LinearGradient>
     </View>
   );
 
@@ -156,16 +123,6 @@ const ProfileScreen: React.FC = () => {
         </View>
       </View>
 
-      <View style={styles.sectionForFav}>
-        <Text style={styles.sectionTitle}>Favoriler</Text>
-        <FlatList
-          data={favorites}
-          renderItem={renderFavoriteItem}
-          keyExtractor={item => item.id}
-          numColumns={1}
-        />
-      </View>
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Geçmiş İşler</Text>
         <FlatList
@@ -176,59 +133,94 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={styles.section}>
-        <TouchableOpacity style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Çıkış Yap</Text>
-        </TouchableOpacity>
+        <LinearGradient
+          colors={['#F36117', '#0a040a']}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+          style={{borderRadius: 25}}>
+          <TouchableOpacity style={styles.logoutButton}>
+            <Text style={styles.logoutText}>Çıkış Yap</Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, padding: 16, backgroundColor: '#f7f7f7'},
+  container: {
+    flex: 1,
+    padding: width * 0.05,
+    backgroundColor: '#f7f7f7',
+  },
   title: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 16,
+    marginVertical: width * 0.04,
   },
-  profilePhotoContainer: {alignItems: 'center', marginBottom: 16},
-  profilePhoto: {width: 100, height: 100, borderRadius: 50},
-  section: {marginVertical: 8, maxHeight: 200},
-  sectionForFav: {marginVertical: 8, maxHeight: 150},
-  sectionTitle: {fontSize: 18, fontWeight: 'bold', marginBottom: 8},
-  inputRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 12},
-  input: {marginLeft: 10, borderBottomWidth: 1, flex: 1, paddingBottom: 4},
-  card: {
-    backgroundColor: '#fff',
-    padding: 10,
-    marginRight: 10,
-    borderRadius: 8,
+  profilePhotoContainer: {
+    alignItems: 'center',
+    marginBottom: width * 0.04,
+  },
+  profilePhoto: {
+    width: width * 0.25,
+    height: width * 0.25,
+    borderRadius: width * 0.125,
+  },
+  section: {
+    marginVertical: width * 0.02,
+    maxHeight: height * 0.3,
+  },
+  sectionTitle: {
+    fontSize: width * 0.045,
+    fontWeight: 'bold',
+    marginBottom: width * 0.02,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: width * 0.03,
   },
-  cardText: {marginLeft: 10},
-  image: {width: 40, height: 40, borderRadius: 20},
+  input: {
+    marginLeft: width * 0.03,
+    borderBottomWidth: 1,
+    flex: 1,
+    paddingBottom: width * 0.02,
+  },
   pastWork: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
+    padding: width * 0.03,
     backgroundColor: '#fff',
-    marginBottom: 10,
-    borderRadius: 8,
+    marginBottom: width * 0.02,
+    borderRadius: width * 0.02,
   },
-  imageSmall: {width: 30, height: 30, borderRadius: 15},
-  pastWorkText: {flex: 1, marginLeft: 10},
-  editButton: {backgroundColor: '#007BFF', padding: 5, borderRadius: 5},
-  editButtonText: {color: '#fff'},
+  imageSmall: {
+    width: width * 0.08,
+    height: width * 0.08,
+    borderRadius: width * 0.04,
+  },
+  pastWorkText: {
+    flex: 1,
+    marginLeft: width * 0.03,
+  },
+  editButton: {
+    padding: width * 0.02,
+    borderRadius: width * 0.02,
+  },
+  editButtonText: {
+    color: '#fff',
+  },
   logoutButton: {
-    backgroundColor: '#FF3B30',
-    padding: 10,
+    padding: width * 0.03,
     alignItems: 'center',
-    borderRadius: 8,
   },
-  logoutText: {color: '#fff', fontSize: 16},
+  logoutText: {
+    color: '#fff',
+    fontSize: width * 0.045,
+  },
 });
 
 export default ProfileScreen;
