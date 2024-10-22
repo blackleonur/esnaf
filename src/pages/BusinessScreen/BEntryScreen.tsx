@@ -9,10 +9,12 @@ import {
 } from 'react-native';
 import BEntryStyle from '../Styles/BEntryStyle';
 import {NavigationProp} from '@react-navigation/native';
-import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome'; // İkonu ekledik
+import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios'; // Axios for sending the request
+import {TokenService} from '../../TokenService';
+
 interface SeperatorText {
   text: string;
 }
@@ -26,20 +28,68 @@ const SeparatorWithText: React.FC<SeperatorText> = ({text = 'VEYA'}) => {
     </View>
   );
 };
+
 interface EntryScreenProp {
   navigation: NavigationProp<any, any>;
 }
 
 function CustomerEntryScreen(navigation: EntryScreenProp) {
-  const [mail, setMail] = useState('');
+  const [loginInput, setLoginInput] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  function Entry() {
-    if (mail !== '' && password !== '') {
-      navigation.navigation.navigate('BussinesHomeScreen');
+  function isValidEmail(input: string) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(input);
+  }
+
+  function isValidPhoneNumber(input: string) {
+    const phoneRegex = /^[0-9]{10,15}$/;
+    return phoneRegex.test(input);
+  }
+
+  async function Entry() {
+    if (loginInput !== '' && password !== '') {
+      if (isValidEmail(loginInput) || isValidPhoneNumber(loginInput)) {
+        try {
+          // Creating the payload to send to the backend
+          const payload = {
+            Identifier: loginInput, // This can be either email or phone
+            Password: password,
+          };
+
+          // Send POST request to the backend (assuming the endpoint is '/api/Business/Login')
+          const response = await axios.post(
+            'http://10.0.2.2:5150/api/Business/Login',
+            payload,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            },
+          );
+
+          if (response.status === 200) {
+            // Navigate to the BusinessHomeScreen if successful
+            const token = response.data.result.token;
+            console.log('token', token);
+            await TokenService.setToken(token); // Save the token
+            navigation.navigation.navigate('BussinesHomeScreen');
+            navigation.navigation.navigate('BussinesHomeScreen');
+          } else {
+            Alert.alert(
+              'Giriş Başarısız',
+              'Lütfen bilgilerinizi kontrol edin.',
+            );
+          }
+        } catch (error) {
+          Alert.alert('Giriş Başarısız', 'Sunucuyla bağlantı kurulamadı.');
+        }
+      } else {
+        Alert.alert('Geçerli bir email veya telefon numarası giriniz.');
+      }
     } else {
-      Alert.alert('Lütfen mail ve şifre alanlarını doldurunuz.');
+      Alert.alert('Lütfen mail/telefon ve şifre alanlarını doldurunuz.');
     }
   }
 
@@ -63,12 +113,13 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
           source={require('../../../src/images/Logo.png')}
         />
         <View style={BEntryStyle.HeaderContainer}>
-          <Text style={BEntryStyle.HeaderText}>Mail</Text>
+          <Text style={BEntryStyle.HeaderText}>Mail veya Telefon</Text>
           <TextInput
             style={BEntryStyle.Text}
-            placeholder="E mail Adresi Giriniz"
-            value={mail}
-            onChangeText={setMail}></TextInput>
+            placeholder="Email adresi veya telefon numarası giriniz"
+            value={loginInput}
+            onChangeText={setLoginInput}
+          />
           <Text style={BEntryStyle.HeaderText}>Şifre</Text>
           <View style={{position: 'relative'}}>
             <TextInput

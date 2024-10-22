@@ -1,36 +1,79 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   Alert,
   Dimensions,
+  StyleSheet,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {NavigationProp} from '@react-navigation/native';
-import {useNavigation} from '@react-navigation/native';
+import {
+  RouteProp,
+  useRoute,
+  NavigationProp,
+  useNavigation,
+} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios';
 
 const {width, height} = Dimensions.get('window');
 
+// Parametrelerin tiplerini tanımlıyoruz
+interface Params {
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
 const ProfileScreen = () => {
+  const route = useRoute<RouteProp<{params: Params}, 'params'>>(); // Tip tanımlaması
+  const navigation = useNavigation<NavigationProp<any>>();
+
+  const {name, surname, email, phone, password} = route.params || {
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    password: '',
+  };
+
   const [workplaceName, setWorkplaceName] = useState('');
   const [address, setAddress] = useState('');
   const [taxNumber, setTaxNumber] = useState('');
   const [kvkkAccepted, setKvkkAccepted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const navigation = useNavigation<NavigationProp<any>>();
-
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [items, setItems] = useState([
-    {label: 'Kafe', value: 'kafe'},
-    {label: 'Restoran', value: 'restoran'},
-    // Diğer kategoriler...
-  ]);
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [items, setItems] = useState<{label: string; value: string}[]>([]);
+
+  // Mağaza verilerini backend'den çekme
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await axios.get(
+          'http://10.0.2.2:5150/api/Store/GetAllStores',
+        );
+        const stores = response.data.result;
+        const formattedStores = stores.map(
+          (store: {id: string; storeName: string}) => ({
+            label: store.storeName,
+            value: store.id,
+          }),
+        );
+        setItems(formattedStores);
+      } catch (error) {
+        console.error('Mağazalar getirilemedi:', error);
+      }
+    };
+
+    fetchStores();
+  }, []);
 
   const showKvkkAlert = () => {
     Alert.alert(
@@ -50,26 +93,56 @@ const ProfileScreen = () => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
-      kvkkAccepted &&
-      termsAccepted &&
-      value &&
-      workplaceName &&
-      address &&
-      taxNumber
+      !kvkkAccepted ||
+      !termsAccepted ||
+      !selectedStoreId ||
+      !workplaceName ||
+      !address ||
+      !taxNumber
     ) {
-      console.log('Form başarıyla gönderildi.');
-    } else {
       Alert.alert(
         'Hata',
         'Lütfen tüm alanları doldurun ve metinleri onaylayın.',
       );
+      return;
     }
-  };
 
-  const goPrice = () => {
-    navigation.navigate('PriceEntryScreen');
+    try {
+      const data = {
+        BusinessOwnerFirstName: name,
+        BusinessOwnerSurname: surname,
+        BusinessOwnerPhone: phone,
+        BusinessName: workplaceName,
+        BusinessAddress: address,
+        BusinessPhone: phone,
+        BusinessEmail: email,
+        BusinessTaxNo: taxNumber,
+        Password: password,
+        StoreId: selectedStoreId,
+        BusinessDescription: ' ',
+      };
+
+      const response = await axios.post(
+        'http://10.0.2.2:5150/api/Business/Register',
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      if (response.status === 200) {
+        Alert.alert('Başarılı', 'Kayıt işlemi başarıyla tamamlandı.');
+        navigation.navigate('PriceEntryScreen', {storeId: selectedStoreId}); // storeId'yi PriceEntryScreen'e gönderiyoruz
+      } else {
+        Alert.alert('Hata', 'Kayıt işlemi başarısız.');
+      }
+    } catch (error) {
+      console.error('Kayıt işlemi sırasında bir hata oluştu:', error);
+      Alert.alert('Hata', 'Kayıt işlemi sırasında bir hata oluştu.');
+    }
   };
 
   return (
@@ -84,9 +157,9 @@ const ProfileScreen = () => {
         <Text style={styles.header}>İş Yeri İsmi</Text>
         <TextInput
           style={styles.input}
+          placeholder="İş yeri ismini girin"
           value={workplaceName}
           onChangeText={setWorkplaceName}
-          placeholder="İş yeri ismini girin"
         />
 
         <Text style={styles.header}>İş Kategorisi</Text>
@@ -103,28 +176,28 @@ const ProfileScreen = () => {
           searchTextInputStyle={styles.searchInput}
           listItemLabelStyle={styles.listItemLabel}
           dropDownContainerStyle={styles.dropDownContainer}
-          ArrowUpIconComponent={({style}) => (
-            <Text style={[style, {fontSize: 20}]}>▲</Text>
-          )}
-          ArrowDownIconComponent={({style}) => (
-            <Text style={[style, {fontSize: 20}]}>▼</Text>
-          )}
+          onChangeValue={val => setSelectedStoreId(val)}
+          onSelectItem={item =>
+            item.value !== undefined
+              ? setSelectedStoreId(item.value)
+              : setSelectedStoreId(null)
+          }
         />
 
         <Text style={styles.header}>İş Yeri Adresi</Text>
         <TextInput
           style={styles.input}
+          placeholder="Adresinizi girin"
           value={address}
           onChangeText={setAddress}
-          placeholder="Adresinizi girin"
         />
 
         <Text style={styles.header}>Vergi Numarası</Text>
         <TextInput
           style={styles.input}
+          placeholder="Vergi numaranızı girin"
           value={taxNumber}
           onChangeText={setTaxNumber}
-          placeholder="Vergi numaranızı girin"
           keyboardType="numeric"
         />
 
@@ -159,8 +232,8 @@ const ProfileScreen = () => {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
           style={styles.buttonGradient}>
-          <TouchableOpacity style={styles.button} onPress={goPrice}>
-            <Text style={styles.buttonText}>Fiyat Seçeneklerini Gir</Text>
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Fiyatlandırmaya Devam</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>
@@ -217,6 +290,7 @@ const styles = StyleSheet.create({
   },
   buttonGradient: {
     borderRadius: 25,
+    marginTop: height * 0.02,
   },
   button: {
     padding: height * 0.02,
@@ -230,9 +304,8 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: width * 0.04,
+    fontWeight: 'bold',
     marginBottom: height * 0.01,
-    color: '#333',
-    marginTop: height * 0.02,
   },
 });
 

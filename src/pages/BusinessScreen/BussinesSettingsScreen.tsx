@@ -13,11 +13,15 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation, CommonActions} from '@react-navigation/native';
+import {NavigationProp} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
 // Ekran boyutuna göre dinamik bir ölçek hesaplayıcı
 const scale = width / 375; // 375, iPhone 6'nın genişliği (referans alınan bir cihaz)
+
 const normalize = (size: number) => {
   const newSize = size * scale;
   if (Platform.OS === 'ios') {
@@ -31,6 +35,8 @@ const BussinesSettingsScreen: React.FC = () => {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(true);
+
+  const navigation = useNavigation(); // Navigation kullanımı
 
   const handleChangePassword = () => {
     Alert.alert(
@@ -65,8 +71,28 @@ const BussinesSettingsScreen: React.FC = () => {
     );
   };
 
-  const handleLogout = () => {
-    Alert.alert('Çıkış Yap', 'Hesabınızdan çıkış yapıldı.');
+  const handleLogout = async () => {
+    try {
+      // Tokeni AsyncStorage'dan sil
+      await AsyncStorage.removeItem('token');
+
+      // Çıkış başarı mesajı göster
+      Alert.alert('Çıkış Yap', 'Hesabınızdan çıkış yapıldı.', [
+        {
+          text: 'Tamam',
+          onPress: () => {
+            // Yönlendirme işlemi
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'BEntryScreen',
+              }),
+            );
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error('Çıkış yaparken hata oluştu:', error);
+    }
   };
 
   return (
@@ -209,36 +235,32 @@ const styles = StyleSheet.create({
     marginVertical: normalize(16),
   },
   sectionTitle: {
-    fontSize: normalize(16),
+    fontSize: normalize(18),
     fontWeight: 'bold',
     marginBottom: normalize(8),
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: normalize(12),
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
   },
   rowText: {
     fontSize: normalize(16),
   },
   rowValue: {
     fontSize: normalize(16),
-    color: '#888',
+    marginRight: normalize(8),
   },
   logoutButton: {
-    marginTop: normalize(32),
-    paddingVertical: normalize(12),
-    borderRadius: normalize(8),
+    paddingVertical: normalize(16),
+    borderRadius: 65,
     alignItems: 'center',
   },
   logoutButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
     fontSize: normalize(16),
-    marginTop: -25,
+    fontWeight: 'bold',
   },
 });
 

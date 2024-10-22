@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,49 +9,93 @@ import {
   Linking,
   Alert,
   Dimensions,
+  BackHandler, // BackHandler'ı ekledik
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import {TokenService} from '../../TokenService'; // TokenService import edildi
 
 interface JobItem {
   id: string;
-  job: string;
-  customerName: string;
-  phoneNumber: string;
-  address: string;
-  uri: string;
+  operationName: string;
+  customerFirstName: string;
+  customerLastName: string;
+  customerPhone: string;
+  customerAddress: string;
 }
 
 const {width, height} = Dimensions.get('window');
 
-const jobData: JobItem[] = [
-  {
-    id: '1',
-    job: 'Petek değişimi',
-    customerName: 'Onur KARAASLAN',
-    phoneNumber: '5442020217',
-    address: 'Kepez, Erenköy 4819sk.',
-    uri: 'https://i.pinimg.com/236x/86/ea/e3/86eae3d8abc2362ad6262916cb950640.jpg',
-  },
-  {
-    id: '2',
-    job: 'Kombi Değişimi',
-    customerName: 'Engin KARAASLAN',
-    phoneNumber: '5457789677',
-    address: 'örtülüpınar mh hasanlı sk no : 10 ',
-    uri: 'https://i.pinimg.com/236x/86/ea/e3/86eae3d8abc2362ad6262916cb950640.jpg',
-  },
-];
-
 const BusinessHomeScreen: React.FC = () => {
+  const [shopName, setShopName] = useState<string>(''); // Dinamik işyeri adı
+  const [jobData, setJobData] = useState<JobItem[]>([]); // Backend'den gelen veriyi tutacak state
+  const navigation = useNavigation<NavigationProp<any>>();
+
+  // Geri tuşuna basıldığında uygulamayı kapatmak için BackHandler ekledik
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Çıkış', 'Uygulamadan çıkmak istiyor musunuz?', [
+        {
+          text: 'Hayır',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'Evet', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true; // Bu geri tuşu olayını işledik, bir önceki sayfaya gidilmesini engelledik
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove(); // Event listener'ı kaldırıyoruz
+  }, []);
+
+  // Token'ı çöz ve işyeri adını al
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      const decodedToken = await TokenService.decodeToken();
+      if (decodedToken && decodedToken.nameid) {
+        const businessId = decodedToken.nameid; // Token'dan businessId alınması
+        setShopName(decodedToken.BusinessName); // İşletme adını state'e kaydet
+      }
+    };
+    fetchTokenData();
+  }, []);
+
+  // Backend'den veriyi çek
+  useEffect(() => {
+    const fetchJobData = async () => {
+      try {
+        const decodedToken = await TokenService.decodeToken();
+        if (decodedToken && decodedToken.nameid) {
+          const businessId = decodedToken.nameid; // Token'dan businessId alınması
+
+          const response = await fetch(
+            `http://10.0.2.2:5150/api/Service/GetServicesByBusiness/${businessId}`, // Business ID'yi URL'ye ekliyoruz
+          );
+          const data = await response.json();
+          if (data.isSuccess) {
+            setJobData(data.result); // Backend'den dönen veriyi state'e kaydet
+          }
+        }
+      } catch (error) {
+        console.error('Veri çekme hatası:', error);
+        Alert.alert('Hata', 'İş verileri alınırken bir sorun oluştu.');
+      }
+    };
+    fetchJobData();
+  }, []);
+
   const handleCallPress = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch(err =>
       Alert.alert('Hata', 'Telefon uygulaması açılamadı.'),
     );
   };
-  const navigation = useNavigation<NavigationProp<any>>();
 
   const handleLocationPress = (address: string) => {
     const query = encodeURIComponent(address);
@@ -60,33 +104,45 @@ const BusinessHomeScreen: React.FC = () => {
       Alert.alert('Hata', 'Harita uygulaması açılamadı.'),
     );
   };
+
   const goProfile = () => {
     navigation.navigate('BussinesProfileScreen');
   };
+
   const goSettings = () => {
     navigation.navigate('BussinesSettingsScreen');
   };
+
   const goCampaigns = () => {
     navigation.navigate('BussinesCampaignScreen');
   };
 
+  // FlatList item render fonksiyonu
   const renderJobItem = ({item}: {item: JobItem}) => (
     <View style={styles.card}>
       <View style={styles.cardcontainer}>
-        <Image source={{uri: item.uri}} style={styles.profileImage} />
-        <Text style={styles.customerName}> {item.customerName}</Text>
+        <Image
+          source={{
+            uri: 'https://i.pinimg.com/236x/86/ea/e3/86eae3d8abc2362ad6262916cb950640.jpg', // Sabit resim örneği
+          }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.customerName}>
+          {item.customerFirstName} {item.customerLastName}
+        </Text>
       </View>
-      <Text style={styles.jobTitle}>Yapılacak İş: {item.job}</Text>
+      <Text style={styles.jobTitle}>Yapılacak İş: {item.operationName}</Text>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Telefon Numarası: {item.phoneNumber}</Text>
-        <TouchableOpacity onPress={() => handleCallPress(item.phoneNumber)}>
+        <Text style={styles.label}>Telefon Numarası: {item.customerPhone}</Text>
+        <TouchableOpacity onPress={() => handleCallPress(item.customerPhone)}>
           <Ionicons name="call" size={24} color="#F36117" />
         </TouchableOpacity>
       </View>
       <View style={styles.row}>
-        <Text style={styles.label}>Adres: {item.address}</Text>
-        <TouchableOpacity onPress={() => handleLocationPress(item.address)}>
+        <Text style={styles.label}>Adres: {item.customerAddress}</Text>
+        <TouchableOpacity
+          onPress={() => handleLocationPress(item.customerAddress)}>
           <Ionicons name="location" size={24} color="#F36117" />
         </TouchableOpacity>
       </View>
@@ -100,11 +156,11 @@ const BusinessHomeScreen: React.FC = () => {
       end={{x: 1, y: 1}}
       style={{flex: 1}}>
       <View style={styles.container}>
-        <Text style={styles.shopName}>Mekan Tesisat</Text>
-
+        <Text style={styles.shopName}>{shopName}</Text>
+        {/* İşyerinin adı dinamik olarak gösteriliyor */}
         <Text style={styles.pendingJobsTitle}>Bekleyen İşler</Text>
         <FlatList
-          data={jobData}
+          data={jobData} // Backend'den gelen veriyi burada kullanıyoruz
           renderItem={renderJobItem}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.jobList}
@@ -139,13 +195,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: height * 0.02, // %2 margin
   },
-  workplaceImage: {
-    width: width * 0.9, // Ekranın %90'ı genişlik
-    height: height * 0.25, // Ekranın %25'i yükseklik
-    resizeMode: 'contain',
-    borderRadius: 8,
-    alignSelf: 'center',
-  },
   pendingJobsTitle: {
     fontSize: width * 0.05, // Dinamik font boyutu
     fontWeight: 'bold',
@@ -172,44 +221,40 @@ const styles = StyleSheet.create({
   jobTitle: {
     fontSize: width * 0.045, // Dinamik font boyutu
     fontWeight: 'bold',
-    marginBottom: height * 0.01, // %1 margin
-  },
-  customerName: {
-    fontSize: width * 0.04, // Dinamik font boyutu
-    marginBottom: height * 0.01, // %1 margin
-    alignSelf: 'center',
-    marginLeft: width * 0.1, // Ekrana göre sol boşluk
-    fontWeight: 'bold',
-  },
-  label: {
-    fontSize: width * 0.04, // Dinamik font boyutu
-    flex: 1,
+    marginBottom: height * 0.02, // %2 margin bottom
   },
   row: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: height * 0.01, // %1 margin
+    marginBottom: height * 0.01, // %1 margin bottom
+  },
+  label: {
+    fontSize: width * 0.04, // Dinamik font boyutu
   },
   profileImage: {
-    width: width * 0.15, // %15 genişlik
-    height: width * 0.15, // %15 yükseklik
-    borderRadius: (width * 0.15) / 2, // Tam yuvarlak
-    marginBottom: height * 0.01, // %1 margin
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 16,
+  },
+  customerName: {
+    fontSize: width * 0.05, // Dinamik font boyutu
+    fontWeight: 'bold',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: height * 0.02, // %2 dikey padding
+    alignItems: 'center',
+    paddingVertical: height * 0.02, // %2 padding
     borderTopWidth: 1,
-    borderColor: '#ccc',
+    borderTopColor: '#F36117',
   },
   footerButton: {
     alignItems: 'center',
   },
   footerButtonText: {
-    marginTop: height * 0.005, // %0.5 margin
-    fontSize: width * 0.035, // Dinamik font boyutu
-    fontWeight: 'bold',
+    fontSize: width * 0.04, // Dinamik font boyutu
   },
 });
 
