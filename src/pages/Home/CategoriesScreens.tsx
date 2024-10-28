@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,172 +10,79 @@ import {
   Modal,
   Dimensions,
 } from 'react-native';
-import {NavigationProp} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome ikonlar
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const {width, height} = Dimensions.get('window');
 
-const categories = [
-  {
-    id: '1',
-    name: 'Akbulut Halı Yıkama',
-    image: 'https://bit.ly/47ysqZn',
-    kesifucreti: 'm² -> 50 TL',
-    koltukyıkamaucreti: '600 TL takım',
-    koltukyıkamaucreti2: '300 TL tekli koltuk',
-    isNear: true,
-    isCheaper: true,
-    isFavs: false,
-    kampanya: true,
-  },
-  {
-    id: '2',
-    name: 'Mevsim Halı Yıkama',
-    image: 'https://bit.ly/3zuH6Mw',
-    kesifucreti: 'm² -> 50 TL',
-    koltukyıkamaucreti: '600 TL takım',
-    koltukyıkamaucreti2: '300 TL tekli koltuk',
-    kampanya: false,
-    isNear: true,
-    isCheaper: false,
-    isFavs: false,
-  },
-  {
-    id: '3',
-    name: 'Yunus Halı Yıkama',
-    image: 'https://bit.ly/3TEYTrd',
-    kesifucreti: 'm² -> 50 TL',
-    koltukyıkamaucreti: '600 TL takım',
-    koltukyıkamaucreti2: '300 TL tekli koltuk',
-    kampanya: true,
-    isNear: false,
-    isCheaper: true,
-    isFavs: true,
-  },
-  {
-    id: '4',
-    name: 'Kapir Halı Yıkama',
-    image: 'https://bit.ly/4gz9nlE',
-    kesifucreti: 'm² -> 50 TL',
-    koltukyıkamaucreti: '600 TL takım',
-    koltukyıkamaucreti2: '300 TL tekli koltuk',
-    kampanya: true,
-    isNear: true,
-    isCheaper: true,
-    isFavs: true,
-  },
-  {
-    id: '5',
-    name: 'Sahan Halı Yıkama',
-    image: 'https://bit.ly/4esYbG5',
-    kesifucreti: ' m² -> 50 TL',
-    koltukyıkamaucreti: '600 tl takım ',
-    koltukyıkamaucreti2: '300 tl  tekli koltuk ',
-    kampanya: false,
-    isNear: false,
-    isCheaper: true,
-    isFavs: true,
-  },
-  {
-    id: '6',
-    name: 'Kepez Halı Yıkama',
-    image: 'https://bit.ly/4exMA83',
-    kesifucreti: ' m² -> 50 TL',
-    koltukyıkamaucreti: '600 tl  ',
-    koltukyıkamaucreti2: '300 tl   ',
-    kampanya: false,
-    isNear: true,
-    isCheaper: false,
-    isFavs: true,
-  },
-];
+interface Business {
+  id: string;
+  businessName: string;
+  businessAddress: string;
+  businessPhone: string;
+  businessEmail: string;
+}
 
 interface CategoriesScreenProps {
   navigation: NavigationProp<any, any>;
+  route: RouteProp<{params: {storeId: string}}, 'params'>;
 }
 
-const CategoriesScreen: React.FC<CategoriesScreenProps> = ({navigation}) => {
+const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
+  navigation,
+  route,
+}) => {
+  const [businesses, setBusinesses] = useState<Business[]>([]);
   const [searchText, setSearchText] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState(categories);
+  const [filteredCategories, setFilteredCategories] = useState<Business[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchBusinesses(route.params.storeId);
+  }, [route.params.storeId]);
+
+  const fetchBusinesses = async (storeId: string) => {
+    try {
+      const response = await fetch(
+        `http://10.0.2.2:5150/api/Store/GetAllBusinessAndIndividualSeller/${storeId}`,
+      );
+      const data = await response.json();
+      if (data.isSuccess) {
+        setBusinesses(data.result.businesses);
+        setFilteredCategories(data.result.businesses);
+      }
+    } catch (error) {
+      console.error('Failed to fetch businesses:', error);
+    }
+  };
 
   const handleSearch = (text: string) => {
     setSearchText(text);
     if (text) {
-      const filtered = categories.filter(category =>
-        category.name.toLowerCase().includes(text.toLowerCase()),
+      const filtered = businesses.filter(business =>
+        business.businessName.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredCategories(filtered);
     } else {
-      setFilteredCategories(categories);
+      setFilteredCategories(businesses);
     }
   };
 
-  const filterByNear = () => {
-    const filtered = categories.filter(category => category.isNear);
-    setFilteredCategories(filtered);
-    setFilterModalVisible(false);
-  };
-
-  const filterByCheaper = () => {
-    const filtered = categories.filter(category => category.isCheaper);
-    setFilteredCategories(filtered);
-    setFilterModalVisible(false);
-  };
-
-  const filterByFavs = () => {
-    const filtered = categories.filter(category => category.isFavs);
-    setFilteredCategories(filtered);
-    setFilterModalVisible(false);
-  };
-
-  const filterByCampaign = () => {
-    const filtered = categories.filter(category => category.kampanya);
-    setFilteredCategories(filtered);
-    setFilterModalVisible(false);
-  };
-
-  const clearFilters = () => {
-    setFilteredCategories(categories);
-    setFilterModalVisible(false);
-  };
-
-  const renderItem = (item: {
-    id: string;
-    name: string;
-    image: string;
-    kesifucreti: string;
-    koltukyıkamaucreti: string;
-    koltukyıkamaucreti2: string;
-    kampanya?: boolean;
-    isNear: boolean;
-    isCheaper: boolean;
-    isFavs: boolean;
-  }) => (
+  const renderItem = ({item}: {item: Business}) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate('MarketScreen')}>
       <View style={styles.cardContainer}>
-        <View style={styles.imageContainer}>
-          <Image source={{uri: item.image}} style={styles.image} />
-        </View>
+        <Image
+          source={{uri: 'https://via.placeholder.com/100'}}
+          style={styles.image}
+        />
         <View style={styles.priceContainer}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          <Text style={styles.priceText}>m² ücreti: {item.kesifucreti}</Text>
-          <Text style={styles.priceText}>
-            Koltuk Takımı Yıkama: {item.koltukyıkamaucreti}
-          </Text>
-          <Text style={styles.priceText}>
-            Tekli Koltuk Yıkama: {item.koltukyıkamaucreti2}
-          </Text>
+          <Text style={styles.cardTitle}>{item.businessName}</Text>
+          <Text style={styles.priceText}>Adres: {item.businessAddress}</Text>
+          <Text style={styles.priceText}>Telefon: {item.businessPhone}</Text>
         </View>
-        {/* ŞOK KAMPANYA */}
-        {item.kampanya && (
-          <View style={styles.kampanyaBadgeContainer}>
-            <Text style={styles.kampanyaBadgeText}>ŞOK KAMPANYA</Text>
-          </View>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -185,7 +92,7 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({navigation}) => {
       colors={['#FFFFFF', '#A6A6A6']}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1}}
-      style={styles.gradientContainer}>
+      style={{flex: 1}}>
       <View style={styles.container}>
         <View style={styles.FilterContainer}>
           <TextInput
@@ -203,7 +110,7 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({navigation}) => {
 
         <FlatList
           data={filteredCategories}
-          renderItem={({item}) => renderItem(item)}
+          renderItem={renderItem}
           keyExtractor={item => item.id}
           numColumns={1}
           contentContainerStyle={styles.list}
@@ -214,68 +121,49 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({navigation}) => {
           visible={filterModalVisible}
           animationType="slide"
           onRequestClose={() => setFilterModalVisible(false)}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={filterByNear}>
-                <Text style={styles.modalButtonText}>Daha Yakın</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={filterByCheaper}>
-                <Text style={styles.modalButtonText}>Daha Ucuz</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={filterByFavs}>
-                <Text style={styles.modalButtonText}>En İyi</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={filterByCampaign}>
-                <Text style={styles.modalButtonText}>Kampanyalı Dükkanlar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={clearFilters}>
-                <Text style={styles.modalButtonText}>Filtreleri Kaldır</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <View style={styles.modalContainer}>{/* Filter options... */}</View>
         </Modal>
 
-        {/* Tab Screen Butonları */}
+        {/* Footer */}
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('SettingsScreen')}>
-            <Icon name="cog" size={width * 0.05} color="#F36117" />
-            <Text style={styles.footerButtonText}>Ayarlar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('FavsScreen')}>
-            <Icon name="heart" size={width * 0.05} color="#F36117" />
-            <Text style={styles.footerButtonText}>Favoriler</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('ProfileScreen')}>
-            <Icon name="user" size={width * 0.05} color="#F36117" />
-            <Text style={styles.footerButtonText}>Profil</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('CampaignScreen')}>
-            <Icon name="tag" size={width * 0.05} color="#F36117" />
-            <Text style={styles.footerButtonText}>Kampanyalar</Text>
-          </TouchableOpacity>
+          <FooterButton
+            navigation={navigation}
+            screen="SettingsScreen"
+            icon="cog"
+            label="Ayarlar"
+          />
+          <FooterButton
+            navigation={navigation}
+            screen="FavsScreen"
+            icon="heart"
+            label="Favoriler"
+          />
+          <FooterButton
+            navigation={navigation}
+            screen="ProfileScreen"
+            icon="user"
+            label="Profil"
+          />
+          <FooterButton
+            navigation={navigation}
+            screen="CampaignScreen"
+            icon="tag"
+            label="Kampanyalar"
+          />
         </View>
       </View>
     </LinearGradient>
   );
 };
+
+const FooterButton = ({navigation, screen, icon, label}: any) => (
+  <TouchableOpacity
+    style={styles.footerButton}
+    onPress={() => navigation.navigate(screen)}>
+    <Icon name={icon} size={24} color="#F36117" style={{marginBottom: 2}} />
+    <Text style={styles.footerButtonText}>{label}</Text>
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   container: {

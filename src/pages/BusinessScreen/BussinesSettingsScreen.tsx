@@ -13,14 +13,11 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation, CommonActions} from '@react-navigation/native';
-import {NavigationProp} from '@react-navigation/native';
+import {TokenService} from '../../TokenService';
 
 const {width, height} = Dimensions.get('window');
-
-// Ekran boyutuna göre dinamik bir ölçek hesaplayıcı
-const scale = width / 375; // 375, iPhone 6'nın genişliği (referans alınan bir cihaz)
+const scale = width / 375;
 
 const normalize = (size: number) => {
   const newSize = size * scale;
@@ -35,8 +32,7 @@ const BussinesSettingsScreen: React.FC = () => {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(true);
-
-  const navigation = useNavigation(); // Navigation kullanımı
+  const navigation = useNavigation();
 
   const handleChangePassword = () => {
     Alert.alert(
@@ -73,15 +69,12 @@ const BussinesSettingsScreen: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      // Tokeni AsyncStorage'dan sil
-      await AsyncStorage.removeItem('token');
+      await TokenService.removeToken();
 
-      // Çıkış başarı mesajı göster
       Alert.alert('Çıkış Yap', 'Hesabınızdan çıkış yapıldı.', [
         {
           text: 'Tamam',
           onPress: () => {
-            // Yönlendirme işlemi
             navigation.dispatch(
               CommonActions.navigate({
                 name: 'BEntryScreen',
@@ -105,7 +98,6 @@ const BussinesSettingsScreen: React.FC = () => {
         <View style={styles.container}>
           <Text style={styles.header}>Ayarlar</Text>
 
-          {/* Hesap Ayarları */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Hesap Ayarları</Text>
             <TouchableOpacity style={styles.row} onPress={handleChangePassword}>
@@ -128,7 +120,6 @@ const BussinesSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Bildirim Ayarları */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Bildirim Ayarları</Text>
             <View style={styles.row}>
@@ -154,7 +145,6 @@ const BussinesSettingsScreen: React.FC = () => {
             </View>
           </View>
 
-          {/* Uygulama Ayarları */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Uygulama Ayarları</Text>
             <TouchableOpacity
@@ -179,7 +169,6 @@ const BussinesSettingsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Destek ve Geri Bildirim */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Destek ve Geri Bildirim</Text>
             <TouchableOpacity style={styles.row} onPress={handleHelpCenter}>

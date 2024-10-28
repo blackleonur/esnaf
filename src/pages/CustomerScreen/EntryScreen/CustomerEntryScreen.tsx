@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
@@ -6,13 +6,13 @@ import {
   Image,
   TextInput,
   Alert,
-  ScrollView, // Scrollable view eklendi
+  ScrollView,
 } from 'react-native';
 import CustomerEntryStyle from '../../Styles/CustomerEntryStyle';
 import {NavigationProp} from '@react-navigation/native';
-import {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {TokenService} from '../../../TokenService';
 
 interface SeperatorText {
   text: string;
@@ -51,8 +51,11 @@ function CustomerEntryScreen({navigation}: EntryScreenProp) {
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  function Entry() {
+  async function Entry() {
     if (mail !== '' && password !== '') {
+      // Simulate a token response
+      const token = 'your_jwt_token_here'; // Replace with actual token from API response
+      await TokenService.setToken(token); // Save the token
       navigation.navigate('FindScreen');
     } else {
       Alert.alert('Lütfen mail ve şifre alanlarını doldurunuz.');

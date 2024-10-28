@@ -8,9 +8,7 @@ import {
   StyleSheet,
   TextInput,
   Dimensions,
-  Platform,
 } from 'react-native';
-import axios from 'axios';
 import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -31,24 +29,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const [categories, setCategories] = useState<Store[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<Store[]>([]);
 
-  // API'den verileri çekme işlevi
-  const fetchStores = async () => {
-    try {
-      const response = await axios.get(
-        'http://10.0.2.2:5150/api/Store/GetAllStores',
-      );
-      if (response.data.isSuccess) {
-        setCategories(response.data.result);
-        setFilteredCategories(response.data.result);
-      }
-    } catch (error) {
-      console.error('Mağaza verileri alınamadı:', error);
-    }
-  };
-
   useEffect(() => {
     fetchStores();
   }, []);
+
+  const fetchStores = async () => {
+    try {
+      const response = await fetch(
+        'http://10.0.2.2:5150/api/Store/GetAllStores',
+      );
+      const data = await response.json();
+      if (data.isSuccess) {
+        setCategories(data.result);
+        setFilteredCategories(data.result);
+      }
+    } catch (error) {
+      console.error('Failed to fetch stores:', error);
+    }
+  };
 
   const handleSearch = (text: string) => {
     setSearchText(text);
@@ -68,7 +66,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       onPress={() =>
         navigation.navigate('CategoriesScreen', {storeId: item.id})
       }>
-      {/* Görsel kısmı boş bırakıldı */}
+      <Image
+        source={{uri: 'https://via.placeholder.com/100'}}
+        style={styles.image}
+      />
       <Text style={styles.cardTitle}>{item.storeName}</Text>
     </TouchableOpacity>
   );
@@ -80,21 +81,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       end={{x: 1, y: 1}}
       style={{flex: 1}}>
       <View style={styles.container}>
-        {/* Arama Çubuğu ve Görsel */}
         <View style={styles.searchContainer}>
           <Image
-            source={require('./../../images/Logo.png')} // Görselin yolu
+            source={require('./../../images/Logo.png')}
             style={styles.logo}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Ne arıyorsunuz?"
             value={searchText}
-            onChangeText={handleSearch} // Arama işlevi
+            onChangeText={handleSearch}
           />
         </View>
 
-        {/* Kategori Listesi */}
         <FlatList
           data={filteredCategories}
           renderItem={renderItem}
@@ -103,60 +102,45 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
           contentContainerStyle={styles.list}
         />
 
-        {/* Alt Menü (Footer) */}
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('SettingsScreen')}>
-            <Icon
-              name="settings"
-              size={24}
-              color="#F36117"
-              style={{marginBottom: 2}}
-            />
-            <Text style={styles.footerButtonText}>Ayarlar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('CampaignScreen')}>
-            <Icon
-              name="campaign"
-              size={24}
-              color="#F36117"
-              style={{marginBottom: 2}}
-            />
-            <Text style={styles.footerButtonText}>Kampanyalar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('FavsScreen')}>
-            <Icon
-              name="favorite"
-              size={24}
-              color="#F36117"
-              style={{marginBottom: 2}}
-            />
-            <Text style={styles.footerButtonText}>Favoriler</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => navigation.navigate('ProfileScreen')}>
-            <Icon
-              name="person"
-              size={24}
-              color="#F36117"
-              style={{marginBottom: 2}}
-            />
-            <Text style={styles.footerButtonText}>Profil</Text>
-          </TouchableOpacity>
+          <FooterButton
+            navigation={navigation}
+            screen="SettingsScreen"
+            icon="settings"
+            label="Ayarlar"
+          />
+          <FooterButton
+            navigation={navigation}
+            screen="CampaignScreen"
+            icon="campaign"
+            label="Kampanyalar"
+          />
+          <FooterButton
+            navigation={navigation}
+            screen="FavsScreen"
+            icon="favorite"
+            label="Favoriler"
+          />
+          <FooterButton
+            navigation={navigation}
+            screen="ProfileScreen"
+            icon="person"
+            label="Profil"
+          />
         </View>
       </View>
     </LinearGradient>
   );
 };
+
+const FooterButton = ({navigation, screen, icon, label}: any) => (
+  <TouchableOpacity
+    style={styles.footerButton}
+    onPress={() => navigation.navigate(screen)}>
+    <Icon name={icon} size={24} color="#F36117" style={{marginBottom: 2}} />
+    <Text style={styles.footerButtonText}>{label}</Text>
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -179,6 +163,12 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  image: {
+    width: width * 0.24,
+    height: width * 0.16,
+    borderRadius: 10,
+    marginBottom: height * 0.02,
+  },
   cardTitle: {
     fontSize: 11,
     fontWeight: 'bold',
@@ -191,9 +181,9 @@ const styles = StyleSheet.create({
     margin: height * 0.03,
   },
   logo: {
-    width: width * 0.1,
+    width: width * 0.1, // Genişliği küçük tuttum
     height: width * 0.1,
-    marginRight: 10,
+    marginRight: 10, // Searchbar ile arasında boşluk
   },
   searchInput: {
     flex: 1,

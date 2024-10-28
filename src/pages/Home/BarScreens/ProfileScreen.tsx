@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,12 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
+import {TokenService} from '../../../TokenService';
 
-// Ekran boyutu için dinamik ölçümler
+// Dynamic measurements based on screen size
 const {width, height} = Dimensions.get('window');
 
-// Interface tanımlamaları
+// Interface definitions
 interface PersonalInfo {
   phone: string;
   email: string;
@@ -30,40 +31,54 @@ interface PastWorkItem {
 }
 
 const ProfileScreen: React.FC = () => {
-  // Kişisel Bilgiler için state
+  // Personal information state
   const [personalData, setPersonalData] = useState<PersonalInfo>({
-    phone: '+90 532 123 45 67',
-    email: 'ahmet.yilmaz@example.com',
-    address: 'İstanbul, Türkiye',
+    phone: '',
+    email: '',
+    address: 'Not specified', // Default for address
   });
 
   const [profilePhoto, setProfilePhoto] = useState<string>(
     'https://randomuser.me/api/portraits/men/4.jpg',
   );
 
-  // Geçmiş İşler statik veri
+  // Static data for past works
   const pastWorks: PastWorkItem[] = [
     {
       id: '1',
-      name: 'Proje 1',
+      name: 'Project 1',
       imageUrl: 'https://randomuser.me/api/portraits/men/3.jpg',
     },
   ];
 
-  // Kişisel Bilgiler düzenleme
-  const handleEdit = (key: keyof PersonalInfo, value: string) => {
-    setPersonalData(prevData => ({
-      ...prevData,
-      [key]: value,
-    }));
-  };
+  // Fetch user data from token
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const decodedToken = await TokenService.decodeToken();
+      if (
+        decodedToken &&
+        'FirstName' in decodedToken && // Check if it's a user
+        'LastName' in decodedToken
+      ) {
+        setPersonalData({
+          phone: decodedToken.PhoneNumber || '',
+          email: decodedToken.email || '',
+          address: `${decodedToken.FirstName} ${decodedToken.LastName}`, // Set user address as Full Name
+        });
+      } else {
+        Alert.alert('Unable to fetch user details from token.');
+      }
+    };
+    fetchUserData();
+  }, []);
 
+  // Handle profile photo change
   const handleProfilePhotoChange = () => {
     launchImageLibrary({mediaType: 'photo', quality: 1}, response => {
       if (response.didCancel) {
-        Alert.alert('İşlem iptal edildi.');
+        Alert.alert('Action cancelled.');
       } else if (response.errorMessage) {
-        Alert.alert('Bir hata oluştu:', response.errorMessage);
+        Alert.alert('An error occurred:', response.errorMessage);
       } else if (response.assets && response.assets.length > 0) {
         setProfilePhoto(response.assets[0].uri || '');
       }
@@ -80,7 +95,7 @@ const ProfileScreen: React.FC = () => {
         end={{x: 1, y: 1}}
         style={{borderRadius: 25}}>
         <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editButtonText}>Düzenle</Text>
+          <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </LinearGradient>
     </View>
@@ -88,43 +103,43 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Profil Fotoğrafı */}
+      {/* Profile Photo */}
       <TouchableOpacity
         onPress={handleProfilePhotoChange}
         style={styles.profilePhotoContainer}>
         <Image source={{uri: profilePhoto}} style={styles.profilePhoto} />
       </TouchableOpacity>
-      <Text style={styles.title}>Profil</Text>
+      <Text style={styles.title}>Profile</Text>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Kişisel Bilgiler</Text>
+        <Text style={styles.sectionTitle}>Personal Information</Text>
         <View style={styles.inputRow}>
-          <Text>Telefon:</Text>
+          <Text>Phone:</Text>
           <TextInput
             style={styles.input}
             value={personalData.phone}
-            onChangeText={text => handleEdit('phone', text)}
+            editable={false} // Make this non-editable
           />
         </View>
         <View style={styles.inputRow}>
-          <Text>E-posta:</Text>
+          <Text>Email:</Text>
           <TextInput
             style={styles.input}
             value={personalData.email}
-            onChangeText={text => handleEdit('email', text)}
+            editable={false} // Make this non-editable
           />
         </View>
         <View style={styles.inputRow}>
-          <Text>Adres:</Text>
+          <Text>Address:</Text>
           <TextInput
             style={styles.input}
             value={personalData.address}
-            onChangeText={text => handleEdit('address', text)}
+            editable={false} // Make this non-editable
           />
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Geçmiş İşler</Text>
+        <Text style={styles.sectionTitle}>Past Works</Text>
         <FlatList
           data={pastWorks}
           renderItem={renderPastWorkItem}
@@ -139,7 +154,7 @@ const ProfileScreen: React.FC = () => {
           end={{x: 1, y: 1}}
           style={{borderRadius: 25}}>
           <TouchableOpacity style={styles.logoutButton}>
-            <Text style={styles.logoutText}>Çıkış Yap</Text>
+            <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>
