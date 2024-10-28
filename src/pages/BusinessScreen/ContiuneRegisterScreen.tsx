@@ -18,6 +18,7 @@ import {
 } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
+import {TokenService} from '../../TokenService';
 
 const {width, height} = Dimensions.get('window');
 
@@ -133,7 +134,13 @@ const ProfileScreen = () => {
           },
         },
       );
+
       if (response.status === 200) {
+        const token = response.data.result.token; // Token'ı response'dan alıyoruz
+
+        // Token'ı AsyncStorage ile kaydediyoruz
+        await TokenService.setToken(token);
+
         Alert.alert('Başarılı', 'Kayıt işlemi başarıyla tamamlandı.');
         navigation.navigate('PriceEntryScreen', {storeId: selectedStoreId}); // storeId'yi PriceEntryScreen'e gönderiyoruz
       } else {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'react-native-image-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
+import {TokenService} from '../../TokenService';
 
 // Ekran genişliği ve yüksekliği
 const {width, height} = Dimensions.get('window');
@@ -24,6 +25,29 @@ const normalizeFont = (size: number) => size * PixelRatio.getFontScale();
 
 const BussinesProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const [userData, setUserData] = useState({
+    name: '',
+    email: '',
+    businessName: '',
+    phoneNumber: '',
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const decodedToken = await TokenService.decodeToken();
+      if (decodedToken) {
+        setUserData({
+          name: decodedToken.nameid,
+          email: decodedToken.email,
+          businessName:
+            'BusinessName' in decodedToken ? decodedToken.BusinessName : '',
+          phoneNumber: decodedToken.PhoneNumber,
+        });
+      }
+    };
+    fetchUserData();
+  }, []);
+
   const projects = [
     {
       id: '1',
@@ -90,7 +114,9 @@ const BussinesProfileScreen: React.FC = () => {
         }}
         style={styles.profileImage}
       />
-      <Text style={styles.profileName}>Ahmet Yılmaz</Text>
+      <Text style={styles.profileName}>
+        {userData.businessName.toUpperCase()}
+      </Text>
 
       {/* Action Buttons */}
       <View style={styles.actionButtonContainer}>
@@ -157,7 +183,18 @@ const styles = StyleSheet.create({
     fontSize: normalizeFont(20),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: scale(16),
+    marginVertical: scale(8),
+  },
+  profileEmail: {
+    fontSize: normalizeFont(16),
+    textAlign: 'center',
+    color: '#666',
+  },
+  profilePhone: {
+    fontSize: normalizeFont(16),
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: scale(8),
   },
   actionButtonContainer: {
     marginVertical: scale(8),
@@ -178,9 +215,6 @@ const styles = StyleSheet.create({
   updateButton: {
     color: '#F36117',
     fontWeight: 'bold',
-  },
-  projectsContainer: {
-    marginTop: scale(16),
   },
   projectCard: {
     width: scale(150),

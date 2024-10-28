@@ -17,10 +17,11 @@ import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import axios from 'axios';
+import {useNavigation} from '@react-navigation/native';
+import {TokenService} from '../../TokenService';
 
 const {width, height} = Dimensions.get('window');
 
-// Parametre tipi
 type RootStackParamList = {
   PriceEntryScreen: {storeId: string};
 };
@@ -35,12 +36,13 @@ interface PricingItem {
 
 const PriceEntryScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'PriceEntryScreen'>>();
-  const {storeId} = route.params; // StoreId'yi alıyoruz
+  const {storeId} = route.params;
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const [pricingData, setPricingData] = useState<PricingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [newServiceLabel, setNewServiceLabel] = useState('');
-  const [originalData, setOriginalData] = useState<PricingItem[]>([]); // To store the original data
+  const [originalData, setOriginalData] = useState<PricingItem[]>([]);
 
   useEffect(() => {
     const fetchPricingData = async () => {
@@ -58,7 +60,7 @@ const PriceEntryScreen: React.FC = () => {
           }),
         );
         setPricingData(pricing);
-        setOriginalData(pricing); // Save original data
+        setOriginalData(pricing);
         setLoading(false);
       } catch (error) {
         console.error('Fiyat verileri getirilemedi:', error);
@@ -120,14 +122,44 @@ const PriceEntryScreen: React.FC = () => {
     );
   };
 
-  const handleFullSave = () => {
-    // Here, you'd normally send the updated data to the backend
-    Alert.alert('Başarılı', 'Tüm değişiklikler kaydedildi!');
-    setOriginalData([...pricingData]); // Update original data after save
+  const handleFullSave = async () => {
+    try {
+      const decodedToken = await TokenService.decodeToken(); // Token'ı çözüp verileri alıyoruz
+
+      if (!decodedToken) {
+        Alert.alert('Hata', 'Kullanıcı kimliği alınamadı!');
+        return;
+      }
+
+      const ownerId = decodedToken.nameid; // Token'dan ownerId'yi alıyoruz
+
+      // Enabled durumu true olan itemları filtreliyoruz
+      const filteredPricingData = pricingData
+        .filter(item => item.enabled) // Yalnızca enabled true olanları alıyoruz
+        .map(item => ({
+          operationName: item.operationName, // OperationName'i dahil ediyoruz
+          price: item.price, // Price'ı dahil ediyoruz
+          quantity: item.quantity, // Quantity'yi dahil ediyoruz
+          ownerId: ownerId, // OwnerId'yi token'dan ekliyoruz
+        }));
+
+      // API'ye post isteği yapıyoruz
+      await axios.post(
+        'http://10.0.2.2:5150/api/Pricing/AddPricing',
+        filteredPricingData,
+      );
+
+      Alert.alert('Başarılı', 'Tüm değişiklikler kaydedildi!');
+      setOriginalData([...pricingData]);
+      navigation.navigate('BussinesHomeScreen');
+    } catch (error) {
+      console.error('Veri gönderme hatası:', error);
+      Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu.');
+    }
   };
 
   const handleCancel = () => {
-    setPricingData([...originalData]); // Reset to original data
+    setPricingData([...originalData]);
     Alert.alert('İptal Edildi', 'Değişiklikler geri alındı.');
   };
 
@@ -205,18 +237,29 @@ const PriceEntryScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Kaydet ve Vazgeç Buttons */}
           <View style={styles.saveCancelButtons}>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleFullSave}>
-              <Text style={styles.buttonText}>Kaydet</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}>
-              <Text style={styles.buttonText}>Vazgeç</Text>
-            </TouchableOpacity>
+            <LinearGradient
+              colors={['#F36117', '#0a040a']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              style={styles.buttonGradient}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleFullSave}>
+                <Text style={styles.buttonText}>Kaydet</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+            <LinearGradient
+              colors={['#F36117', '#0a040a']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              style={styles.buttonGradient}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}>
+                <Text style={styles.buttonText}>Vazgeç</Text>
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -269,10 +312,14 @@ const styles = StyleSheet.create({
     padding: height * 0.015,
     borderRadius: width * 0.05,
   },
+  buttonGradient: {
+    borderRadius: 25,
+    marginTop: height * 0.02,
+  },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: width * 0.05,
+    fontSize: width * 0.035,
   },
   newServiceContainer: {
     flexDirection: 'row',
@@ -283,9 +330,9 @@ const styles = StyleSheet.create({
   newServiceInput: {
     borderWidth: 1,
     borderColor: 'gray',
-    padding: height * 0.015,
+    padding: height * 0.009,
     borderRadius: width * 0.05,
-    width: '70%',
+    width: '69%',
   },
   addButton: {
     backgroundColor: '#F36117',
@@ -295,24 +342,23 @@ const styles = StyleSheet.create({
   saveCancelButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: height * 0.03,
+    marginTop: height * 0.002,
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    paddingLeft: height * 0.07,
+    paddingRight: height * 0.07,
     padding: height * 0.02,
-    width: '45%',
-    alignItems: 'center',
     borderRadius: width * 0.05,
   },
   cancelButton: {
-    backgroundColor: '#f44336',
     padding: height * 0.02,
-    width: '45%',
-    alignItems: 'center',
+    paddingLeft: height * 0.07,
+    paddingRight: height * 0.07,
     borderRadius: width * 0.05,
+    alignSelf: 'center',
   },
   gradientButton: {
-    borderRadius: width * 0.05,
+    borderRadius: width * 0.07,
   },
 });
 

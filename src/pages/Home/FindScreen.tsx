@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,20 +10,17 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
+import axios from 'axios';
 import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const {width, height} = Dimensions.get('window');
 
-const categories = [
-  {id: '1', name: 'Elektrikçi', image: 'https://bit.ly/47ysqZn'},
-  {id: '2', name: 'Marangoz', image: 'https://bit.ly/3zuH6Mw'},
-  {id: '3', name: 'Temizlikçi', image: 'https://bit.ly/3TEYTrd'},
-  {id: '4', name: 'Halı yıkamacı', image: 'https://bit.ly/4gz9nlE'},
-  {id: '5', name: 'Tesisatçı', image: 'https://bit.ly/4esYbG5'},
-  {id: '6', name: 'Bayan kuaförü', image: 'https://bit.ly/4exMA83'},
-];
+interface Store {
+  id: string;
+  storeName: string;
+}
 
 interface HomeScreenProps {
   navigation: NavigationProp<any, any>;
@@ -31,13 +28,33 @@ interface HomeScreenProps {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const [searchText, setSearchText] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState(categories);
+  const [categories, setCategories] = useState<Store[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<Store[]>([]);
+
+  // API'den verileri çekme işlevi
+  const fetchStores = async () => {
+    try {
+      const response = await axios.get(
+        'http://10.0.2.2:5150/api/Store/GetAllStores',
+      );
+      if (response.data.isSuccess) {
+        setCategories(response.data.result);
+        setFilteredCategories(response.data.result);
+      }
+    } catch (error) {
+      console.error('Mağaza verileri alınamadı:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStores();
+  }, []);
 
   const handleSearch = (text: string) => {
     setSearchText(text);
     if (text) {
       const filtered = categories.filter(category =>
-        category.name.toLowerCase().includes(text.toLowerCase()),
+        category.storeName.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredCategories(filtered);
     } else {
@@ -45,16 +62,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     }
   };
 
-  const renderItem = ({
-    item,
-  }: {
-    item: {id: string; name: string; image: string};
-  }) => (
+  const renderItem = ({item}: {item: Store}) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('CategoriesScreen')}>
-      <Image source={{uri: item.image}} style={styles.image} />
-      <Text style={styles.cardTitle}>{item.name}</Text>
+      onPress={() =>
+        navigation.navigate('CategoriesScreen', {storeId: item.id})
+      }>
+      {/* Görsel kısmı boş bırakıldı */}
+      <Text style={styles.cardTitle}>{item.storeName}</Text>
     </TouchableOpacity>
   );
 
@@ -68,7 +83,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         {/* Arama Çubuğu ve Görsel */}
         <View style={styles.searchContainer}>
           <Image
-            source={require('./../../images/Logo.png')} // Görselin yolu buraya
+            source={require('./../../images/Logo.png')} // Görselin yolu
             style={styles.logo}
           />
           <TextInput
@@ -164,12 +179,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  image: {
-    width: width * 0.24,
-    height: width * 0.16,
-    borderRadius: 10,
-    marginBottom: height * 0.02,
-  },
   cardTitle: {
     fontSize: 11,
     fontWeight: 'bold',
@@ -182,9 +191,9 @@ const styles = StyleSheet.create({
     margin: height * 0.03,
   },
   logo: {
-    width: width * 0.1, // Genişliği küçük tuttum
+    width: width * 0.1,
     height: width * 0.1,
-    marginRight: 10, // Searchbar ile arasında boşluk
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,

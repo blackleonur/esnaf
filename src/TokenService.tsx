@@ -1,15 +1,28 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {JwtPayload, jwtDecode} from 'jwt-decode'; // Doğru şekilde jwtDecode import edildi
+import {JwtPayload, jwtDecode} from 'jwt-decode';
 
 const TOKEN_KEY = 'authToken';
 
-// Token içinde yer alan verileri tanımlayan arayüz
-interface CustomJwtPayload extends JwtPayload {
+// Business ve User için ortak verileri tanımlayan genel arayüz
+interface BaseJwtPayload extends JwtPayload {
   nameid: string;
   email: string;
-  BusinessName: string;
   PhoneNumber: string;
 }
+
+// Business kullanıcısına özel verileri tanımlayan arayüz
+interface BusinessJwtPayload extends BaseJwtPayload {
+  BusinessName: string;
+}
+
+// User kullanıcısına özel verileri tanımlayan arayüz
+interface UserJwtPayload extends BaseJwtPayload {
+  FirstName: string;
+  LastName: string;
+}
+
+// Kullanıcı türlerini kapsayan birleşik tip
+type CustomJwtPayload = BusinessJwtPayload | UserJwtPayload;
 
 export const TokenService = {
   async setToken(token: string) {
@@ -36,7 +49,7 @@ export const TokenService = {
     try {
       const token = await this.getToken();
       if (token) {
-        const decoded = jwtDecode<CustomJwtPayload>(token); // Token CustomJwtPayload tipine göre çözüldü
+        const decoded = jwtDecode<CustomJwtPayload>(token);
         console.log('Decoded token:', decoded);
         return decoded;
       }
@@ -57,11 +70,19 @@ export const TokenService = {
 };
 
 // Token'ı kullanarak ilgili verilere erişim
-TokenService.decodeToken().then((decodedToken: CustomJwtPayload | null) => {
+TokenService.decodeToken().then(decodedToken => {
   if (decodedToken) {
     console.log('ID:', decodedToken.nameid);
-    console.log('Business Name:', decodedToken.BusinessName);
-    console.log('Phone Number:', decodedToken.PhoneNumber);
     console.log('Email:', decodedToken.email);
+    console.log('Phone Number:', decodedToken.PhoneNumber);
+
+    if ('BusinessName' in decodedToken) {
+      // Business kullanıcısı için
+      console.log('Business Name:', decodedToken.BusinessName);
+    } else if ('FirstName' in decodedToken && 'LastName' in decodedToken) {
+      // User kullanıcısı için
+      console.log('First Name:', decodedToken.FirstName);
+      console.log('Last Name:', decodedToken.LastName);
+    }
   }
 });
