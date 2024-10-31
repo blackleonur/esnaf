@@ -1,168 +1,306 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   Image,
   FlatList,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Linking,
+  Dimensions,
+  Button,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../../types';
 
-const categories = [
-  {
-    id: '1',
-    name: 'MEKAN TESİSAT',
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuWqdEM4Rb3ObHTPlVqY9kuMu4XzT6PulPRQ&s',
-    kesifucreti: 300,
-    Kombidegisimi: 5000,
-    petekdegisimi: 1500,
-    muslukdegisimi: 650,
-    gidertemizleme: 900,
-    yerdenisitma: 15000,
-    kazandegisimi: 28000,
-    petektemizligi: 3000,
-    isNear: true,
-    isCheaper: true,
-    isFavs: false,
-  },
-];
+interface Pricing {
+  operationName: string;
+  price: number;
+  quantity: number;
+  id: string; // Ensure the pricing item has an 'id' field for identification
+}
 
-const serviceDetails = [
-  {key: 'kesifucreti', label: 'Keşif Ücreti', value: categories[0].kesifucreti},
-  {
-    key: 'Kombidegisimi',
-    label: 'Kombi Değişimi',
-    value: categories[0].Kombidegisimi,
-  },
-  {
-    key: 'petekdegisimi',
-    label: 'Petek Değişimi',
-    value: categories[0].petekdegisimi,
-  },
-  {
-    key: 'muslukdegisimi',
-    label: 'Musluk Değişimi',
-    value: categories[0].muslukdegisimi,
-  },
-  {
-    key: 'gidertemizleme',
-    label: 'Gider Temizleme',
-    value: categories[0].gidertemizleme,
-  },
-  {
-    key: 'yerdenisitma',
-    label: 'Yerden Isıtma',
-    value: categories[0].yerdenisitma,
-  },
-  {
-    key: 'kazandegisimi',
-    label: 'Kazan Değişimi',
-    value: categories[0].kazandegisimi,
-  },
-  {
-    key: 'petektemizligi',
-    label: 'Petek Temizliği',
-    value: categories[0].petektemizligi,
-  },
-];
+interface BusinessProfile {
+  supplierName: string;
+  supplierPhone: string;
+  supplierAdress: string;
+  pricingListDto: Pricing[];
+}
 
-const MarketScreen = () => {
+type MarketScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'MarketScreen'
+>;
+
+const MarketScreen = ({route}: {route: any}) => {
+  const {ownerId} = route.params;
+  const navigation = useNavigation<MarketScreenNavigationProp>();
+
+  const [profileData, setProfileData] = useState<BusinessProfile | null>(null);
+  const [selectedServices, setSelectedServices] = useState<
+    {operationName: string; quantity: number; id: string; price: number}[]
+  >([]);
+
+  const {width, height} = Dimensions.get('window');
+
+  useEffect(() => {
+    fetchProfileData(ownerId);
+  }, [ownerId]);
+
+  const fetchProfileData = async (ownerId: string) => {
+    try {
+      const response = await fetch(
+        `http://10.0.2.2:5150/api/Profile/GetProfileByOwnerIdAsync/${ownerId}`,
+      );
+      const data = await response.json();
+      if (data.isSuccess) {
+        setProfileData(data.result);
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile data:', error);
+    }
+  };
+
+  const handleServiceQuantityChange = (
+    operationName: string,
+    delta: number,
+    id: string,
+    price: number, // Price parameter added here
+  ) => {
+    setSelectedServices(prevSelectedServices => {
+      const updatedServices = [...prevSelectedServices];
+      const index = updatedServices.findIndex(
+        service => service.operationName === operationName,
+      );
+
+      if (index !== -1) {
+        updatedServices[index].quantity += delta;
+        if (updatedServices[index].quantity <= 0) {
+          updatedServices.splice(index, 1);
+        }
+      } else if (delta > 0) {
+        updatedServices.push({operationName, quantity: delta, id, price});
+      }
+      return updatedServices;
+    });
+  };
+
+  const handleCallPress = (phoneNumber: string) => {
+    Linking.openURL(`tel: ${0 + phoneNumber}`).catch(err =>
+      Alert.alert('Hata', 'Telefon uygulaması açılamadı.'),
+    );
+  };
+
+  const handleLocationPress = (address: string) => {
+    const query = encodeURIComponent(address);
+    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+    Linking.openURL(url).catch(err =>
+      Alert.alert('Hata', 'Harita uygulaması açılamadı.'),
+    );
+  };
+
+  const handleCreateMeetingPress = () => {
+    navigation.navigate('MeetingScreen', {
+      ownerId,
+      selectedServices: selectedServices.map(service => ({
+        operationName: service.operationName,
+        quantity: service.quantity,
+        id: service.id,
+        price: service.price, // Price field added here
+      })),
+      profileData,
+    });
+  };
+
   return (
     <View style={style.container}>
-      {/* Başlık ve Görsel */}
-      <View style={style.HeaderContainer}>
-        <Text style={style.HeaderText}>{categories[0].name}</Text>
-        <Image style={style.Image} source={{uri: categories[0].image}} />
-      </View>
+      {profileData && (
+        <>
+          <View style={style.headerContainer}>
+            <Text style={style.headerText}>{profileData.supplierName}</Text>
+            <Image
+              style={style.image}
+              source={{uri: 'https://via.placeholder.com/150'}}
+            />
+          </View>
 
-      {/* Bilgi Alanı */}
-      <View style={style.InfoContainer}>
-        <Text style={style.InfoMarketHeader}>MEKAN TESİSAT HAKKINDA</Text>
-        <View style={{maxHeight: 200}}>
-          <FlatList
-            data={serviceDetails}
-            keyExtractor={item => item.key}
-            renderItem={({item}) => (
-              <View style={style.InfoMarket}>
-                <Text style={style.InfoText}>
-                  {item.label}: {item.value} TL
-                </Text>
-              </View>
-            )}
-          />
-        </View>
-      </View>
+          <View style={style.flatListContainer}>
+            <FlatList
+              data={profileData.pricingListDto}
+              keyExtractor={item => item.id}
+              renderItem={({item}) => {
+                const service = selectedServices.find(
+                  service => service.operationName === item.operationName,
+                );
+                const quantity = service ? service.quantity : 0;
 
-      <View style={style.ButtonContiner}>
-        <TouchableOpacity style={style.Button}>
-          <Text style={style.ButtonText}>İletişime Geç</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={style.Button}>
-          <Text style={style.ButtonText}>Yol Tarifi Al</Text>
-        </TouchableOpacity>
-      </View>
+                return (
+                  <View style={style.priceItem}>
+                    <Text style={style.priceText}>
+                      {item.operationName}: {item.price} ₺
+                    </Text>
+                    <View style={style.counterContainer}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleServiceQuantityChange(
+                            item.operationName,
+                            -1,
+                            item.id,
+                            item.price,
+                          )
+                        }>
+                        <Icon name="minus" size={20} color="#3b5998" />
+                      </TouchableOpacity>
+                      <Text style={style.quantityText}>{quantity}</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleServiceQuantityChange(
+                            item.operationName,
+                            1,
+                            item.id,
+                            item.price,
+                          )
+                        }>
+                        <Icon name="plus" size={20} color="#3b5998" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              }}
+            />
+          </View>
+
+          <View style={style.buttonContainer}>
+            <Button
+              title="Randevu Oluştur"
+              onPress={handleCreateMeetingPress}
+              color="#3b5998"
+            />
+          </View>
+
+          <View style={style.infoContainer}>
+            <View style={style.infoRow}>
+              <Text style={style.infoText}>
+                Telefon: {profileData.supplierPhone}
+              </Text>
+              <TouchableOpacity
+                onPress={() => handleCallPress(profileData.supplierPhone)}>
+                <Icon
+                  name="phone"
+                  size={24}
+                  color="#3b5998"
+                  style={style.icon}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={style.infoRow}>
+              <Text style={style.infoText}>
+                Adres: {profileData.supplierAdress}
+              </Text>
+              <TouchableOpacity
+                onPress={() => handleLocationPress(profileData.supplierAdress)}>
+                <Icon
+                  name="map-marker"
+                  size={24}
+                  color="#3b5998"
+                  style={style.icon}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </>
+      )}
     </View>
   );
 };
 
-export default MarketScreen;
-
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
+    padding: 16,
+    backgroundColor: '#f8f8f8',
   },
-  HeaderContainer: {
-    flexDirection: 'column',
+  headerContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    marginBottom: 16,
   },
-  HeaderText: {
-    fontSize: 35,
+  headerText: {
+    fontSize: Dimensions.get('window').width * 0.06,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
+    color: '#333',
   },
-  Image: {
-    width: '90%',
-    height: 200,
-    borderRadius: 10,
-  },
-  InfoContainer: {
-    flexDirection: 'column',
-    padding: 18,
-  },
-  InfoMarketHeader: {
-    alignSelf: 'center',
-    fontSize: 20,
-    marginBottom: 10,
-    fontWeight: 'bold',
-  },
-  InfoMarket: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 5,
-    borderBottomWidth: 1,
+  image: {
+    width: Dimensions.get('window').width * 0.4,
+    height: Dimensions.get('window').width * 0.4,
+    borderRadius: Dimensions.get('window').width * 0.2,
+    marginBottom: 12,
     borderColor: '#ccc',
-    marginVertical: 8, // Başlık ve fiyat arasına boşluk eklemek için
+    borderWidth: 1,
   },
-  InfoText: {
-    fontSize: 16,
+  flatListContainer: {
+    maxHeight: Dimensions.get('window').height * 0.3,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    marginBottom: 16,
+  },
+  infoContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 8,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  infoText: {
+    fontSize: Dimensions.get('window').width * 0.045,
+    color: '#333',
+  },
+  icon: {
+    marginLeft: 8,
+  },
+  priceItem: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  priceText: {
+    fontSize: Dimensions.get('window').width * 0.045,
     color: '#555',
   },
-  ButtonContiner: {
+  counterContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
+    alignItems: 'center',
   },
-  Button: {
-    backgroundColor: '#FF6347',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  ButtonText: {
-    color: 'white',
+  quantityText: {
+    marginHorizontal: 10,
     fontSize: 16,
+    color: '#333',
   },
 });
+
+export default MarketScreen;

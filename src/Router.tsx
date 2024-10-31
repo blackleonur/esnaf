@@ -39,15 +39,16 @@ import NonBusinessHomeScreen from './pages/BusinessScreen/NonBussinesHomeScreen'
 import NonBussinesProfileScreen from './pages/BusinessScreen/SignScreens/NonBussinesProfileScreen';
 import NonBussinesCampaignScreen from './pages/BusinessScreen/NonBussinesCampaignScreen';
 import TryScreen from './pages/TryScreen';
-const Stack = createNativeStackNavigator();
+import MeetingScreen from './pages/Home/MarketsScreen/MeetingScreen';
+import {RootStackParamList} from './types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-const FindScreenStack = () => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="FindScreen" component={FindScreen} />
-    </Stack.Navigator>
-  );
-};
+type CategoriesScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  'CategoriesScreen'
+>;
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
@@ -61,6 +62,9 @@ export default function App() {
           component={MarketScreen}
           initialParams={{comment: '', rating: 0}}
         />
+        <Stack.Screen name="FindScreen" component={FindScreen} />
+        <Stack.Screen name="MeetingScreen" component={MeetingScreen} />
+
         <Stack.Screen
           name="BusinessEntryScreen"
           component={BusinessEntryScreen}
@@ -74,7 +78,6 @@ export default function App() {
           component={NonBusinessEntryScreen}
         />
         <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-        <Stack.Screen name="FindScreen" component={FindScreen} />
         <Stack.Screen
           name="VerificationScreen"
           component={VerificationScreen}
@@ -84,7 +87,12 @@ export default function App() {
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
         <Stack.Screen name="CampaignScreen" component={CampaignScreen} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="CategoriesScreen" component={CategoriesScreen} />
+        <Stack.Screen
+          name="CategoriesScreen"
+          component={CategoriesScreen}
+          options={{title: 'Categories'}}
+          initialParams={{storeId: 'default-store-id'}} // Varsayılan `storeId` parametresi
+        />
         <Stack.Screen name="CommentScreen" component={CommentScreen} />
         <Stack.Screen name="BEntryScreen" component={BEntryScreen} />
         <Stack.Screen name="BRegisterScreen" component={BRegisterScreen} />

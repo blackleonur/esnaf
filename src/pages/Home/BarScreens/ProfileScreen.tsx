@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
+import {useNavigation} from '@react-navigation/native'; // Navigation import edildi
 import {TokenService} from '../../../TokenService';
 
 // Dynamic measurements based on screen size
@@ -31,7 +32,7 @@ interface PastWorkItem {
 }
 
 const ProfileScreen: React.FC = () => {
-  // Personal information state
+  const navigation = useNavigation(); // Navigation hook'u tanımlandı
   const [personalData, setPersonalData] = useState<PersonalInfo>({
     phone: '',
     email: '',
@@ -51,19 +52,18 @@ const ProfileScreen: React.FC = () => {
     },
   ];
 
-  // Fetch user data from token
   useEffect(() => {
     const fetchUserData = async () => {
       const decodedToken = await TokenService.decodeToken();
       if (
         decodedToken &&
-        'FirstName' in decodedToken && // Check if it's a user
+        'FirstName' in decodedToken &&
         'LastName' in decodedToken
       ) {
         setPersonalData({
           phone: decodedToken.PhoneNumber || '',
           email: decodedToken.email || '',
-          address: `${decodedToken.FirstName} ${decodedToken.LastName}`, // Set user address as Full Name
+          address: `${decodedToken.FirstName} ${decodedToken.LastName}`,
         });
       } else {
         Alert.alert('Unable to fetch user details from token.');
@@ -72,7 +72,6 @@ const ProfileScreen: React.FC = () => {
     fetchUserData();
   }, []);
 
-  // Handle profile photo change
   const handleProfilePhotoChange = () => {
     launchImageLibrary({mediaType: 'photo', quality: 1}, response => {
       if (response.didCancel) {
@@ -83,6 +82,11 @@ const ProfileScreen: React.FC = () => {
         setProfilePhoto(response.assets[0].uri || '');
       }
     });
+  };
+
+  const handleLogout = async () => {
+    await TokenService.removeToken(); // Token siliniyor
+    navigation.navigate('HomeScreen' as never); // HomeScreen'e yönlendirme yapılıyor
   };
 
   const renderPastWorkItem = ({item}: {item: PastWorkItem}) => (
@@ -103,7 +107,6 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Profile Photo */}
       <TouchableOpacity
         onPress={handleProfilePhotoChange}
         style={styles.profilePhotoContainer}>
@@ -117,7 +120,7 @@ const ProfileScreen: React.FC = () => {
           <TextInput
             style={styles.input}
             value={personalData.phone}
-            editable={false} // Make this non-editable
+            editable={false}
           />
         </View>
         <View style={styles.inputRow}>
@@ -125,7 +128,7 @@ const ProfileScreen: React.FC = () => {
           <TextInput
             style={styles.input}
             value={personalData.email}
-            editable={false} // Make this non-editable
+            editable={false}
           />
         </View>
         <View style={styles.inputRow}>
@@ -133,7 +136,7 @@ const ProfileScreen: React.FC = () => {
           <TextInput
             style={styles.input}
             value={personalData.address}
-            editable={false} // Make this non-editable
+            editable={false}
           />
         </View>
       </View>
@@ -153,8 +156,8 @@ const ProfileScreen: React.FC = () => {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
           style={{borderRadius: 25}}>
-          <TouchableOpacity style={styles.logoutButton}>
-            <Text style={styles.logoutText}>Log Out</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Çıkış Yap</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>

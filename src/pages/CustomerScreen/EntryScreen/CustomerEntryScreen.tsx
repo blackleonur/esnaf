@@ -53,10 +53,34 @@ function CustomerEntryScreen({navigation}: EntryScreenProp) {
 
   async function Entry() {
     if (mail !== '' && password !== '') {
-      // Simulate a token response
-      const token = 'your_jwt_token_here'; // Replace with actual token from API response
-      await TokenService.setToken(token); // Save the token
-      navigation.navigate('FindScreen');
+      try {
+        const response = await fetch('http://10.0.2.2:5150/api/User/Login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            Identifier: mail,
+            Password: password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.isSuccess && data.result && data.result.token) {
+          const token = data.result.token;
+          await TokenService.setToken(token); // Token'ı kaydet
+          navigation.navigate('FindScreen'); // Başarılı giriş sonrası yönlendirme
+        } else {
+          Alert.alert('Giriş Başarısız', 'Geçersiz kullanıcı adı veya şifre.');
+        }
+      } catch (error) {
+        console.error('Giriş isteğinde hata:', error);
+        Alert.alert(
+          'Giriş Başarısız',
+          'Bir hata oluştu, lütfen tekrar deneyin.',
+        );
+      }
     } else {
       Alert.alert('Lütfen mail ve şifre alanlarını doldurunuz.');
     }

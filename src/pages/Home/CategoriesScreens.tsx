@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const {width, height} = Dimensions.get('window');
 
+// İşletme verilerini tanımlayan tür
 interface Business {
   id: string;
   businessName: string;
@@ -24,9 +25,20 @@ interface Business {
   businessEmail: string;
 }
 
+// Navigasyon için Parametre Listesi
+type RootStackParamList = {
+  CategoriesScreen: {storeId: string};
+  MarketScreen: undefined;
+  SettingsScreen: undefined;
+  FavsScreen: undefined;
+  ProfileScreen: undefined;
+  CampaignScreen: undefined;
+};
+
+// CategoriesScreen bileşeni için props türü
 interface CategoriesScreenProps {
-  navigation: NavigationProp<any, any>;
-  route: RouteProp<{params: {storeId: string}}, 'params'>;
+  navigation: NavigationProp<RootStackParamList, 'CategoriesScreen'>;
+  route: RouteProp<RootStackParamList, 'CategoriesScreen'>;
 }
 
 const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
@@ -38,6 +50,7 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
   const [filteredCategories, setFilteredCategories] = useState<Business[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
+  // İşletmeleri fetch eder
   useEffect(() => {
     fetchBusinesses(route.params.storeId);
   }, [route.params.storeId]);
@@ -68,11 +81,12 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
       setFilteredCategories(businesses);
     }
   };
-
   const renderItem = ({item}: {item: Business}) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('MarketScreen')}>
+      onPress={() =>
+        navigation.navigate('MarketScreen', {ownerId: item.id} as any)
+      }>
       <View style={styles.cardContainer}>
         <Image
           source={{uri: 'https://via.placeholder.com/100'}}
@@ -169,9 +183,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  gradientContainer: {
-    flex: 1,
-  },
   FilterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -217,10 +228,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  imageContainer: {
-    flex: 1,
-    marginRight: width * 0.02,
-  },
   image: {
     width: width * 0.25,
     height: width * 0.25,
@@ -237,22 +244,6 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: width * 0.03,
     color: '#333',
-  },
-  kampanyaBadgeContainer: {
-    position: 'absolute',
-    top: height * 0.01, // Kartın dışına biraz taşıyoruz
-    right: -width * 0.154,
-
-    paddingVertical: height * 0.007,
-    paddingHorizontal: width * 0.1, // Dinamik boyutlandırma
-    transform: [{rotate: '45deg'}],
-    borderRadius: width * 0.01,
-  },
-  kampanyaBadgeText: {
-    color: 'red',
-    fontWeight: 'bold',
-    fontSize: width * 0.025,
-    textAlign: 'center',
   },
   footer: {
     flexDirection: 'row',
@@ -278,26 +269,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: width * 0.05,
-    padding: height * 0.03,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalButton: {
-    backgroundColor: '#F36117',
-    padding: height * 0.015,
-    borderRadius: width * 0.03,
-    marginVertical: height * 0.01,
-    width: '100%',
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: width * 0.03,
   },
 });
 
