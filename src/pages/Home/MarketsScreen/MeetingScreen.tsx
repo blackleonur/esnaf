@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,32 +7,48 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
+  Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {RootStackParamList} from '../../../types';
+import {TokenService} from '../../../TokenService';
 
 type MeetingScreenRouteProp = RouteProp<RootStackParamList, 'MeetingScreen'>;
 
 interface Service {
   operationName: string;
   quantity: number;
-  price: number; // Ücret bilgisi
+  price: number;
+  pricingId: string; // Doğrudan pricingId olarak kullanıyoruz
 }
 
 const MeetingScreen = () => {
   const route = useRoute<MeetingScreenRouteProp>();
   const {ownerId, selectedServices: initialSelectedServices} = route.params;
-
   const [selectedServices, setSelectedServices] = useState<Service[]>(
     initialSelectedServices,
   );
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [description, setDescription] = useState('');
+  const [userInfo, setUserInfo] = useState<any>(null);
 
-  // Toplam ücreti hesaplayan fonksiyon
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const decodedToken = await TokenService.decodeToken();
+      if (decodedToken) {
+        setUserInfo(decodedToken);
+      } else {
+        Alert.alert(
+          'Hata',
+          'Kullanıcı bilgileri alınamadı. Lütfen tekrar giriş yapınız.',
+        );
+      }
+    };
+    fetchUserInfo();
+  }, []);
+
   const calculateTotalPrice = () => {
     return selectedServices.reduce(
       (total, service) => total + service.price * service.quantity,
@@ -40,7 +56,6 @@ const MeetingScreen = () => {
     );
   };
 
-  // Miktarı artıran/azaltan fonksiyonlar
   const increaseQuantity = (index: number) => {
     const updatedServices = [...selectedServices];
     updatedServices[index].quantity += 1;
@@ -62,13 +77,60 @@ const MeetingScreen = () => {
     }
   };
 
+  const saveMeeting = async () => {
+    if (!selectedDate || !userInfo?.nameid) {
+      Alert.alert(
+        'Eksik Bilgi',
+        'Lütfen tarih seçin ve kullanıcı bilgilerini kontrol edin.',
+      );
+      return;
+    }
+
+    const requestBody = {
+      operationDescription: description,
+      creationDate: selectedDate.toISOString(),
+      totalPrice: calculateTotalPrice(),
+      ownerId,
+      userId: userInfo.nameid,
+      pricingsWithQuantities: selectedServices.map(service => ({
+        pricingId: service.pricingId, // pricingId olarak kullanıyoruz
+        quantity: service.quantity,
+        unitPrice: service.price * service.quantity,
+      })),
+    };
+
+    try {
+      const response = await fetch(
+        'http://10.0.2.2:5150/api/Service/AddService',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        },
+      );
+
+      if (response.ok) {
+        Alert.alert('Başarılı', 'Randevu başarıyla kaydedildi!');
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Hata', `Randevu kaydedilemedi: ${errorData.message}`);
+      }
+    } catch (error) {
+      Alert.alert(
+        'Hata',
+        'Randevu kaydedilemedi. Lütfen bağlantınızı kontrol edin.',
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Hizmet Listesi */}
       <Text style={styles.title}>Seçili Hizmetler:</Text>
       <FlatList
         data={selectedServices}
-        keyExtractor={item => item.operationName}
+        keyExtractor={item => item.pricingId}
         renderItem={({item, index}) => (
           <View style={styles.serviceItem}>
             <Text style={styles.serviceText}>
@@ -95,7 +157,6 @@ const MeetingScreen = () => {
         Toplam Ücret: ₺{calculateTotalPrice()}
       </Text>
 
-      {/* Tarih Seçici */}
       <Text style={styles.label}>Randevu Başlangıç Tarihi:</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <Text style={styles.dateText}>
@@ -111,7 +172,6 @@ const MeetingScreen = () => {
         />
       )}
 
-      {/* Açıklama Alanı */}
       <Text style={styles.label}>Açıklama:</Text>
       <TextInput
         style={styles.descriptionInput}
@@ -121,9 +181,12 @@ const MeetingScreen = () => {
         onChangeText={setDescription}
       />
 
-      {/* Kaydet Butonu */}
       <View style={styles.buttonContainer}>
-        <Button title="Randevuyu Kaydet" onPress={() => {}} color="#3b5998" />
+        <Button
+          title="Randevuyu Kaydet"
+          onPress={saveMeeting}
+          color="#3b5998"
+        />
       </View>
     </View>
   );
@@ -211,6 +274,16 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 16,
+  },
+  userInfoContainer: {
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

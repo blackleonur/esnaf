@@ -57,11 +57,7 @@ export default function App() {
         initialRouteName="HomeScreen"
         screenOptions={{headerShown: true}}>
         <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
-        <Stack.Screen
-          name="MarketScreen"
-          component={MarketScreen}
-          initialParams={{comment: '', rating: 0}}
-        />
+        <Stack.Screen name="MarketScreen" component={MarketScreen} />
         <Stack.Screen name="FindScreen" component={FindScreen} />
         <Stack.Screen name="MeetingScreen" component={MeetingScreen} />
 

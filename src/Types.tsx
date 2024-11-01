@@ -1,6 +1,6 @@
 export type RootStackParamList = {
   WelcomeScreen: undefined;
-  MarketScreen: {comment: string; rating: number};
+  MarketScreen: {ownerId: string};
   FindScreen: undefined;
   BusinessEntryScreen: undefined;
   CustomerEntryScreen: undefined;
@@ -37,13 +37,14 @@ export type RootStackParamList = {
   NonBussinesCampaignScreen: undefined;
   MeetingScreen: {
     ownerId: string;
-    selectedServices: {
-      operationName: string;
-      quantity: number;
-      id: string;
-      price: number;
-    }[];
-    profileData: any;
+    selectedServices: SelectedService[];
   };
   Try: undefined;
+};
+
+export type SelectedService = {
+  pricingId: string;
+  operationName: string;
+  quantity: number;
+  price: number;
 };
