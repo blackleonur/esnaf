@@ -8,7 +8,7 @@ const AppConfig = ({ config }: { config: any }) => {
       //   projectId: '',
       // },
     },
-    plugins: [],
+    plugins: ['expo-build-properties'],
     runtimeVersion: {
       policy: 'sdkVersion',
     },
