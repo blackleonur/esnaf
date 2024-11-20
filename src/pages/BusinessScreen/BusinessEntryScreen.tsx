@@ -4,7 +4,7 @@ import BussinesEntryStyle from '../Styles/BussinessEntryStyle';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import BEntryScreen from './BEntryScreen';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface goBentryprop {
   navigation: NavigationProp<any, any>;

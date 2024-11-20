@@ -12,7 +12,7 @@ import {
   Dimensions,
   SafeAreaView,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import {NavigationProp} from '@react-navigation/native';
 
 interface WelcomeScreenProps {

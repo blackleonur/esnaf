@@ -12,7 +12,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import {TokenService} from '../../TokenService';
 
 const {width, height} = Dimensions.get('window');

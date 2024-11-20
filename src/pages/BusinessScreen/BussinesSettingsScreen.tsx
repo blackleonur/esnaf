@@ -6,30 +6,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Dimensions,
-  Platform,
-  PixelRatio,
   ScrollView,
   BackHandler,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {TokenService} from '../../TokenService';
 import {useFocusEffect} from '@react-navigation/native';
+import { normalize } from 'src/utils/normalize';
 
-const {width, height} = Dimensions.get('window');
-const scale = width / 375;
-const navigation = useNavigation();
-
-const normalize = (size: number) => {
-  const newSize = size * scale;
-  if (Platform.OS === 'ios') {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
-  } else {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
-  }
-};
 
 const BussinesSettingsScreen: React.FC = () => {
   const [pushNotifications, setPushNotifications] = useState(true);

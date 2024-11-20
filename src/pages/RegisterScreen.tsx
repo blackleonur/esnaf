@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckBox from '@react-native-community/checkbox';
 import styles from './Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Apiurl from '../Apiurl';
 

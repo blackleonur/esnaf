@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import axios from 'axios';
-import {RootStackParamList} from '../../../types';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 type Service = {
@@ -86,7 +85,7 @@ const MarketScreen = () => {
   };
 
   type MarketScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
+    any,
     'MarketScreen'
   >;
   // MeetingScreen'e seçilen servisleri yönlendirme

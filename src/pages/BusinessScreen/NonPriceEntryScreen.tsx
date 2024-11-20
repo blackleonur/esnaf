@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type RootStackParamList = {
   NonBusinessHomeScreen: undefined;

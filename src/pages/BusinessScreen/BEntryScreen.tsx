@@ -11,7 +11,7 @@ import BEntryStyle from '../Styles/BEntryStyle';
 import {NavigationProp} from '@react-navigation/native';
 import {useState} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios'; // Axios for sending the request
 import {TokenService} from '../../TokenService';
 import Apiurl from '../../Apiurl';

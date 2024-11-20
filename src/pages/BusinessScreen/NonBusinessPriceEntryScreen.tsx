@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';

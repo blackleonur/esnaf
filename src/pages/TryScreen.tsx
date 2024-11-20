@@ -1,7 +1,8 @@
-import React from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import {NavigationProp} from '@react-navigation/native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { NavigationProp } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { scale } from 'src/utils/scaling';
 
 interface WelcomeScreenProps {
   navigation: NavigationProp<any, any>;
@@ -19,16 +20,12 @@ const TryScreen = (navigation: WelcomeScreenProps) => {
   return (
     <LinearGradient
       colors={['#FCFEFD', '#0A3140']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={{flex: 1}}>
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}>
       {/* Logo */}
       <View style={styles.imageContainer}>
-        <Image
-          source={require('../images/Logo.png')}
-          style={styles.image}
-          resizeMode="contain"
-        />
+        <Image source={require('../images/Logo.png')} style={styles.image} resizeMode='contain' />
       </View>
 
       {/* Esnafa Hoşgeldiniz Metni */}
@@ -62,7 +59,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 280,
+    width: scale(280), //TODO: scale fonksiyonu ile boyutlandırarak tüm cihazlarda responsive görünür
     height: 280,
     borderRadius: 999,
   },

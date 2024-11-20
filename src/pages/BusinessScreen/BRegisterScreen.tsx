@@ -11,7 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const {width, height} = Dimensions.get('window');
 

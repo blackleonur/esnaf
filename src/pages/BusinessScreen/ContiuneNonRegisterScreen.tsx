@@ -16,7 +16,7 @@ import {
   NavigationProp,
   useNavigation,
 } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import {TokenService} from '../../TokenService';
 import Apiurl from '../../Apiurl';

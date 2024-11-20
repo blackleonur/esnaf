@@ -12,7 +12,7 @@ import {
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import {useFocusEffect} from '@react-navigation/native';
-const navigation = useNavigation<NavigationProp<any>>();
+import { height, width } from 'src/utils/scaling';
 
 interface Campaign {
   id: string;
@@ -21,22 +21,22 @@ interface Campaign {
   imageUri: string;
 }
 
-const {width, height} = Dimensions.get('window');
-useFocusEffect(
-  React.useCallback(() => {
-    const onBackPress = () => {
-      navigation.goBack();
-      return true;
-    };
-
-    BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-    return () =>
-      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  }, [navigation]),
-);
 const BussinesCampaignScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const {width, height} = Dimensions.get('window');
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+  
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+  
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [navigation]),
+  );
   const [campaigns, setCampaigns] = useState<Campaign[]>([
     {
       id: '1',

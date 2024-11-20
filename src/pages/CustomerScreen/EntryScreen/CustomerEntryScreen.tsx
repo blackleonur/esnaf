@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import CustomerEntryStyle from '../../Styles/CustomerEntryStyle';
 import {NavigationProp} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {TokenService} from '../../../TokenService';
 import Apiurl from '../../../Apiurl';

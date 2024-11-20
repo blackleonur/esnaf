@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import {useNavigation} from '@react-navigation/native'; // Navigation import edildi
 import {TokenService} from '../../../TokenService';
 

@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Apiurl from '../../Apiurl';
 
