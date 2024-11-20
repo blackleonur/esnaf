@@ -3,258 +3,181 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
-  FlatList,
   TouchableOpacity,
-  Linking,
   Alert,
   Dimensions,
-  BackHandler, // BackHandler'ı ekledik
+  BackHandler,
+  Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
-import {TokenService} from '../../TokenService'; // TokenService import edildi
-
-interface JobItem {
-  id: string;
-  operationName: string;
-  customerFirstName: string;
-  customerLastName: string;
-  customerPhone: string;
-  customerAddress: string;
-}
+import {TokenService} from '../../TokenService';
 
 const {width, height} = Dimensions.get('window');
 
 const BusinessHomeScreen: React.FC = () => {
-  const [shopName, setShopName] = useState<string>(''); // Dinamik işyeri adı
-  const [jobData, setJobData] = useState<JobItem[]>([]); // Backend'den gelen veriyi tutacak state
+  const [shopName, setShopName] = useState<string>('');
   const navigation = useNavigation<NavigationProp<any>>();
+  const placeholderImageUrl = 'https://via.placeholder.com/150';
 
-  // Geri tuşuna basıldığında uygulamayı kapatmak için BackHandler ekledik
+  const goPendingServices = () => navigation.navigate('BPendingServicesArea');
+  const goCompletedServices = () =>
+    navigation.navigate('BCompletedServicesArea');
+  const goActivatedServices = () =>
+    navigation.navigate('BActivitiedServicesArea');
+  const goCommentServices = () => navigation.navigate('BussinesCommentScreen');
+
   useEffect(() => {
     const backAction = () => {
       Alert.alert('Çıkış', 'Uygulamadan çıkmak istiyor musunuz?', [
-        {
-          text: 'Hayır',
-          onPress: () => null,
-          style: 'cancel',
-        },
+        {text: 'Hayır', onPress: () => null, style: 'cancel'},
         {text: 'Evet', onPress: () => BackHandler.exitApp()},
       ]);
-      return true; // Bu geri tuşu olayını işledik, bir önceki sayfaya gidilmesini engelledik
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
     );
-
-    return () => backHandler.remove(); // Event listener'ı kaldırıyoruz
+    return () => backHandler.remove();
   }, []);
 
-  // Token'ı çöz ve işyeri adını al
   useEffect(() => {
     const fetchTokenData = async () => {
       const decodedToken = await TokenService.decodeToken();
-      if (decodedToken && decodedToken.nameid) {
-        const businessId = decodedToken.nameid; // Token'dan businessId alınması
-        setShopName(decodedToken.BusinessName); // İşletme adını state'e kaydet
+      if (decodedToken && 'BusinessName' in decodedToken) {
+        setShopName(decodedToken.BusinessName);
       }
     };
     fetchTokenData();
   }, []);
 
-  // Backend'den veriyi çek
-  useEffect(() => {
-    const fetchJobData = async () => {
-      try {
-        const decodedToken = await TokenService.decodeToken();
-        if (decodedToken && decodedToken.nameid) {
-          const businessId = decodedToken.nameid; // Token'dan businessId alınması
-
-          const response = await fetch(
-            `http://10.0.2.2:5150/api/Service/GetServicesByBusiness/${businessId}`, // Business ID'yi URL'ye ekliyoruz
-          );
-          const data = await response.json();
-          if (data.isSuccess) {
-            setJobData(data.result); // Backend'den dönen veriyi state'e kaydet
-          }
-        }
-      } catch (error) {
-        console.error('Veri çekme hatası:', error);
-        Alert.alert('Hata', 'İş verileri alınırken bir sorun oluştu.');
-      }
-    };
-    fetchJobData();
-  }, []);
-
-  const handleCallPress = (phoneNumber: string) => {
-    Linking.openURL(`tel:${phoneNumber}`).catch(err =>
-      Alert.alert('Hata', 'Telefon uygulaması açılamadı.'),
-    );
-  };
-
-  const handleLocationPress = (address: string) => {
-    const query = encodeURIComponent(address);
-    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
-    Linking.openURL(url).catch(err =>
-      Alert.alert('Hata', 'Harita uygulaması açılamadı.'),
-    );
-  };
-
-  const goProfile = () => {
-    navigation.navigate('BussinesProfileScreen');
-  };
-
-  const goSettings = () => {
-    navigation.navigate('BussinesSettingsScreen');
-  };
-
-  const goCampaigns = () => {
-    navigation.navigate('BussinesCampaignScreen');
-  };
-
-  // FlatList item render fonksiyonu
-  const renderJobItem = ({item}: {item: JobItem}) => (
-    <View style={styles.card}>
-      <View style={styles.cardcontainer}>
-        <Image
-          source={{
-            uri: 'https://i.pinimg.com/236x/86/ea/e3/86eae3d8abc2362ad6262916cb950640.jpg', // Sabit resim örneği
-          }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.customerName}>
-          {item.customerFirstName} {item.customerLastName}
-        </Text>
-      </View>
-      <Text style={styles.jobTitle}>Yapılacak İş: {item.operationName}</Text>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Telefon Numarası: {item.customerPhone}</Text>
-        <TouchableOpacity onPress={() => handleCallPress(item.customerPhone)}>
-          <Ionicons name="call" size={24} color="#F36117" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>Adres: {item.customerAddress}</Text>
-        <TouchableOpacity
-          onPress={() => handleLocationPress(item.customerAddress)}>
-          <Ionicons name="location" size={24} color="#F36117" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
   return (
-    <LinearGradient
-      colors={['#FFFFFF', '#A6A6A6']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={{flex: 1}}>
-      <View style={styles.container}>
-        <Text style={styles.shopName}>{shopName}</Text>
-        {/* İşyerinin adı dinamik olarak gösteriliyor */}
-        <Text style={styles.pendingJobsTitle}>Bekleyen İşler</Text>
-        <FlatList
-          data={jobData} // Backend'den gelen veriyi burada kullanıyoruz
-          renderItem={renderJobItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.jobList}
-        />
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton} onPress={goProfile}>
-            <Ionicons name="person" size={24} color="#F36117" />
-            <Text style={styles.footerButtonText}>Profil</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={goSettings}>
-            <Ionicons name="settings" size={24} color="#F36117" />
-            <Text style={styles.footerButtonText}>Ayarlar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={goCampaigns}>
-            <Ionicons name="megaphone" size={24} color="#F36117" />
-            <Text style={styles.footerButtonText}>Kampanya Düzenle</Text>
-          </TouchableOpacity>
-        </View>
+    <LinearGradient colors={['#FFFFFF', '#A6A6A6']} style={{flex: 1}}>
+      <View style={styles.header}>
+        <Text style={styles.shopName}>{shopName.toUpperCase()}</Text>
+        {/* Görsel Alanı */}
+        <Image style={styles.shopImage} source={{uri: placeholderImageUrl}} />
+      </View>
+
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={styles.cardButton} onPress={goPendingServices}>
+          <Ionicons name="time-outline" size={30} color="#F36117" />
+          <Text style={styles.cardText}>Bekleyen Randevular</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cardButton}
+          onPress={goActivatedServices}>
+          <Ionicons name="play-outline" size={30} color="#3A85FF" />
+          <Text style={styles.cardText}>Aktif İşler</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cardButton}
+          onPress={goCompletedServices}>
+          <Ionicons name="checkmark-done-outline" size={30} color="#4CAF50" />
+          <Text style={styles.cardText}>Tamamlanmış İşler</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cardButton} onPress={goCommentServices}>
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={30}
+            color="#FF9800"
+          />
+          <Text style={styles.cardText}>Yorumlar</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => navigation.navigate('BussinesProfileScreen')}>
+          <Ionicons name="person" size={24} color="#F36117" />
+          <Text style={styles.footerButtonText}>Profil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => navigation.navigate('BussinesSettingsScreen')}>
+          <Ionicons name="settings" size={24} color="#F36117" />
+          <Text style={styles.footerButtonText}>Ayarlar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => navigation.navigate('BussinesCampaignScreen')}>
+          <Ionicons name="megaphone" size={24} color="#F36117" />
+          <Text style={styles.footerButtonText}>Kampanya Düzenle</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: width * 0.04, // %4 padding
+  header: {
+    alignItems: 'center',
+    paddingVertical: height * 0.05,
   },
   shopName: {
-    fontSize: width * 0.06, // Dinamik font boyutu
+    fontSize: width * 0.06,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: height * 0.02, // %2 margin
+    color: '#333',
+    marginBottom: height * 0.02,
   },
-  pendingJobsTitle: {
-    fontSize: width * 0.05, // Dinamik font boyutu
-    fontWeight: 'bold',
-    marginBottom: height * 0.02, // %2 margin
+  shopImage: {
+    width: width * 0.8,
+    height: width * 0.4,
+    borderRadius: width * 0.1,
+    backgroundColor: '#e5e5e5',
   },
-  jobList: {
-    paddingBottom: height * 0.02, // %2 padding
-  },
-  card: {
-    backgroundColor: '#FFFFF9',
-    padding: width * 0.05, // %5 padding
-    borderRadius: 8,
-    marginBottom: height * 0.02, // %2 margin bottom
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  cardcontainer: {
-    backgroundColor: '#f8f8f8',
+  buttonsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    marginVertical: height * 0.02,
   },
-  jobTitle: {
-    fontSize: width * 0.045, // Dinamik font boyutu
-    fontWeight: 'bold',
-    marginBottom: height * 0.02, // %2 margin bottom
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  cardButton: {
+    width: width * 0.4,
+    height: height * 0.18,
+    backgroundColor: '#FFF',
     alignItems: 'center',
-    marginBottom: height * 0.01, // %1 margin bottom
+    justifyContent: 'center',
+    borderRadius: 10,
+    marginBottom: height * 0.02,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
   },
-  label: {
-    fontSize: width * 0.04, // Dinamik font boyutu
-  },
-  profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 16,
-  },
-  customerName: {
-    fontSize: width * 0.05, // Dinamik font boyutu
-    fontWeight: 'bold',
+  cardText: {
+    marginTop: 10,
+    fontSize: width * 0.04,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: height * 0.02, // %2 padding
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#F36117',
+    borderColor: '#e5e5e5',
   },
   footerButton: {
     alignItems: 'center',
   },
   footerButtonText: {
-    fontSize: width * 0.04, // Dinamik font boyutu
+    fontSize: 12,
+    color: '#F36117',
+    marginTop: 4,
   },
 });
 

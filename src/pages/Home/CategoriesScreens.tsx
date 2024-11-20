@@ -13,6 +13,7 @@ import {
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Apiurl from '../../Apiurl';
 
 const {width, height} = Dimensions.get('window');
 
@@ -23,6 +24,13 @@ interface Business {
   businessAddress: string;
   businessPhone: string;
   businessEmail: string;
+}
+
+interface IndividualSeller {
+  id: string;
+  sellerFirstName: string;
+  sellerLastName: string;
+  sellerPhone: string;
 }
 
 // Navigasyon için Parametre Listesi
@@ -46,8 +54,13 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
   route,
 }) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [individualSellers, setIndividualSellers] = useState<
+    IndividualSeller[]
+  >([]);
   const [searchText, setSearchText] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState<Business[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<
+    (Business | IndividualSeller)[]
+  >([]);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
   // İşletmeleri fetch eder
@@ -58,12 +71,16 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
   const fetchBusinesses = async (storeId: string) => {
     try {
       const response = await fetch(
-        `http://10.0.2.2:5150/api/Store/GetAllBusinessAndIndividualSeller/${storeId}`,
+        `${Apiurl}/api/Store/GetAllBusinessAndIndividualSeller/${storeId}`,
       );
       const data = await response.json();
       if (data.isSuccess) {
-        setBusinesses(data.result.businesses);
-        setFilteredCategories(data.result.businesses);
+        setBusinesses(data.result.businesses || []);
+        setIndividualSellers(data.result.individualSellers || []);
+        setFilteredCategories([
+          ...data.result.businesses,
+          ...data.result.individualSellers,
+        ]);
       }
     } catch (error) {
       console.error('Failed to fetch businesses:', error);
@@ -73,33 +90,71 @@ const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
   const handleSearch = (text: string) => {
     setSearchText(text);
     if (text) {
-      const filtered = businesses.filter(business =>
-        business.businessName.toLowerCase().includes(text.toLowerCase()),
-      );
+      const filtered = [...businesses, ...individualSellers].filter(item => {
+        if ('businessName' in item) {
+          return item.businessName.toLowerCase().includes(text.toLowerCase());
+        } else {
+          return item.sellerFirstName
+            .toLowerCase()
+            .includes(text.toLowerCase());
+        }
+      });
       setFilteredCategories(filtered);
     } else {
-      setFilteredCategories(businesses);
+      setFilteredCategories([...businesses, ...individualSellers]);
     }
   };
-  const renderItem = ({item}: {item: Business}) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate('MarketScreen', {ownerId: item.id} as any)
-      }>
-      <View style={styles.cardContainer}>
-        <Image
-          source={{uri: 'https://via.placeholder.com/100'}}
-          style={styles.image}
-        />
-        <View style={styles.priceContainer}>
-          <Text style={styles.cardTitle}>{item.businessName}</Text>
-          <Text style={styles.priceText}>Adres: {item.businessAddress}</Text>
-          <Text style={styles.priceText}>Telefon: {item.businessPhone}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+
+  const renderItem = ({item}: {item: Business | IndividualSeller}) => {
+    if ('businessName' in item) {
+      // İşletme (Business) türündeki öğeyi göster
+      return (
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() =>
+            navigation.navigate('MarketScreen', {ownerId: item.id} as any)
+          }>
+          <View style={styles.cardContainer}>
+            <Image
+              source={{uri: 'https://via.placeholder.com/100'}}
+              style={styles.image}
+            />
+            <View style={styles.priceContainer}>
+              <Text style={styles.cardTitle}>{item.businessName}</Text>
+              <Text style={styles.priceText}>
+                Adres: {item.businessAddress}
+              </Text>
+              <Text style={styles.priceText}>
+                Telefon: {item.businessPhone}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    } else {
+      // Bireysel Satıcı (IndividualSeller) türündeki öğeyi göster
+      return (
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() =>
+            navigation.navigate('MarketScreen', {ownerId: item.id} as any)
+          }>
+          <View style={styles.cardContainer}>
+            <Image
+              source={{uri: 'https://via.placeholder.com/100'}}
+              style={styles.image}
+            />
+            <View style={styles.priceContainer}>
+              <Text style={styles.cardTitle}>
+                {item.sellerFirstName} {item.sellerLastName}
+              </Text>
+              <Text style={styles.priceText}>Telefon: {item.sellerPhone}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+  };
 
   return (
     <LinearGradient

@@ -19,6 +19,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import {TokenService} from '../../TokenService';
+import Apiurl from '../../Apiurl';
 
 const {width, height} = Dimensions.get('window');
 
@@ -57,9 +58,7 @@ const ProfileScreen = () => {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await axios.get(
-          'http://10.0.2.2:5150/api/Store/GetAllStores',
-        );
+        const response = await axios.get(`${Apiurl}/api/Store/GetAllStores`);
         const stores = response.data.result;
         const formattedStores = stores.map(
           (store: {id: string; storeName: string}) => ({
@@ -126,7 +125,7 @@ const ProfileScreen = () => {
       };
 
       const response = await axios.post(
-        'http://10.0.2.2:5150/api/Business/Register',
+        `${Apiurl}/api/Business/Register`,
         data,
         {
           headers: {

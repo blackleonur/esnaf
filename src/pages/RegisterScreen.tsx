@@ -6,6 +6,7 @@ import styles from './Styles/RegisterScreenStyles';
 import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
+import Apiurl from '../Apiurl';
 
 interface RegisterScreenProps {
   navigation: NavigationProp<any, any>;
@@ -68,7 +69,7 @@ const RegisterScreen = (navigation: RegisterScreenProps) => {
 
     try {
       const response = await axios.post(
-        'http://10.0.2.2:5150/api/User/Register',
+        `${Apiurl}/api/User/Register`,
         userData,
         {
           headers: {

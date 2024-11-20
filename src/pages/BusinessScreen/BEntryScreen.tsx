@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios'; // Axios for sending the request
 import {TokenService} from '../../TokenService';
+import Apiurl from '../../Apiurl';
 
 interface SeperatorText {
   text: string;
@@ -60,7 +61,7 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
 
           // Send POST request to the backend (assuming the endpoint is '/api/Business/Login')
           const response = await axios.post(
-            'http://10.0.2.2:5150/api/Business/Login',
+            `${Apiurl}/api/Business/Login`,
             payload,
             {
               headers: {
@@ -68,7 +69,7 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
               },
             },
           );
-
+          console.log('blablaasd');
           if (response.status === 200) {
             // Navigate to the BusinessHomeScreen if successful
             const token = response.data.result.token;
@@ -84,6 +85,7 @@ function CustomerEntryScreen(navigation: EntryScreenProp) {
           }
         } catch (error) {
           Alert.alert('Giriş Başarısız', 'Sunucuyla bağlantı kurulamadı.');
+          console.log(error);
         }
       } else {
         Alert.alert('Geçerli bir email veya telefon numarası giriniz.');

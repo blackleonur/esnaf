@@ -72,6 +72,15 @@ const ProfileScreen: React.FC = () => {
     fetchUserData();
   }, []);
 
+  const goActivetedServices = () => {
+    navigation.navigate('UserActivetedServicesArea' as never);
+  };
+  const goPendingServices = () => {
+    navigation.navigate('UserPendingServicesArea' as never);
+  };
+  const goCompletedServices = () => {
+    navigation.navigate('UserCompletedServicesArea' as never);
+  };
   const handleProfilePhotoChange = () => {
     launchImageLibrary({mediaType: 'photo', quality: 1}, response => {
       if (response.didCancel) {
@@ -142,12 +151,21 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Past Works</Text>
-        <FlatList
-          data={pastWorks}
-          renderItem={renderPastWorkItem}
-          keyExtractor={item => item.id}
-        />
+        <TouchableOpacity onPress={goPendingServices}>
+          <Text style={styles.sectionTitle}>Bekleyen Randevular</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <TouchableOpacity onPress={goActivetedServices}>
+          <Text style={styles.sectionTitle}>Aktif Randevular</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <TouchableOpacity onPress={goCompletedServices}>
+          <Text style={styles.sectionTitle}>Tamamlanmış İşler</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>

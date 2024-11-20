@@ -19,6 +19,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import {TokenService} from '../../TokenService';
+import {AxiosError} from 'axios';
+import Apiurl from '../../Apiurl';
 
 const {width, height} = Dimensions.get('window');
 
@@ -51,7 +53,7 @@ const PriceUpdateScreen: React.FC = () => {
         const ownerId = decodedToken.nameid;
 
         const response = await axios.get(
-          `http://10.0.2.2:5150/api/Pricing/GetPricingWithOwnerId/${ownerId}`,
+          `${Apiurl}/api/Pricing/GetPricingWithOwnerId/${ownerId}`,
         );
         const pricing = response.data.result.map(
           (item: {operationName: string; price: number; quantity: number}) => ({
@@ -143,17 +145,19 @@ const PriceUpdateScreen: React.FC = () => {
         ownerId: ownerId,
       }));
 
-      await axios.post(
-        'http://10.0.2.2:5150/api/Pricing/AddPricing',
-        updatedPricingData,
-      );
+      await axios.post(`${Apiurl}/api/Pricing/AddPricing`, updatedPricingData);
 
       Alert.alert('Başarılı', 'Tüm değişiklikler kaydedildi!');
       setOriginalData([...pricingData]);
       navigation.navigate('BussinesHomeScreen');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Veri gönderme hatası:', error);
-      Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu.');
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessage = error.response.data.errors.join('\n');
+        Alert.alert('Hata', errorMessage);
+      } else {
+        Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu.');
+      }
     }
   };
 
@@ -360,4 +364,5 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.07,
   },
 });
+
 export default PriceUpdateScreen;

@@ -9,12 +9,14 @@ import {
   Alert,
   Dimensions,
   PixelRatio,
+  BackHandler,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'react-native-image-picker';
 import {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import {TokenService} from '../../TokenService';
+import {useFocusEffect} from '@react-navigation/native';
 
 // Ekran genişliği ve yüksekliği
 const {width, height} = Dimensions.get('window');
@@ -31,6 +33,19 @@ const BussinesProfileScreen: React.FC = () => {
     businessName: '',
     phoneNumber: '',
   });
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [navigation]),
+  );
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -47,22 +62,6 @@ const BussinesProfileScreen: React.FC = () => {
     };
     fetchUserData();
   }, []);
-
-  const projects = [
-    {
-      id: '1',
-      name: 'Proje 1',
-      description: 'Modern ofis tasarımı',
-      imageUri:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3ke4oBJu7WoxLxqkTYbfz4km8u7qpSKRpdA&s',
-    },
-    {
-      id: '2',
-      name: 'Proje 2',
-      description: 'Klasik ev dekorasyonu',
-      imageUri: 'https://www.yapikatalogu.com/Files/Products/31423/31423.jpg',
-    },
-  ];
 
   const renderProject = ({item}: {item: any}) => (
     <View style={styles.projectCard}>

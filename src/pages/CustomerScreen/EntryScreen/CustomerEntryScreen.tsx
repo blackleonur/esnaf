@@ -13,6 +13,7 @@ import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {TokenService} from '../../../TokenService';
+import Apiurl from '../../../Apiurl';
 
 interface SeperatorText {
   text: string;
@@ -54,7 +55,7 @@ function CustomerEntryScreen({navigation}: EntryScreenProp) {
   async function Entry() {
     if (mail !== '' && password !== '') {
       try {
-        const response = await fetch('http://10.0.2.2:5150/api/User/Login', {
+        const response = await fetch(`${Apiurl}/api/User/Login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

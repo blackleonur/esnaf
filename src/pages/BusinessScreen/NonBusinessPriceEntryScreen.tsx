@@ -35,7 +35,7 @@ interface PricingItem {
   enabled: boolean;
 }
 
-const PriceEntryScreen: React.FC = () => {
+const NonBusinessPriceEntryScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'PriceEntryScreen'>>();
   const {storeId} = route.params;
   const navigation = useNavigation<NavigationProp<any>>();
@@ -149,7 +149,7 @@ const PriceEntryScreen: React.FC = () => {
 
       Alert.alert('Başarılı', 'Tüm değişiklikler kaydedildi!');
       setOriginalData([...pricingData]);
-      navigation.navigate('BussinesHomeScreen');
+      navigation.navigate('NonBusinessHomeScreen');
     } catch (error) {
       console.error('Veri gönderme hatası:', error);
       Alert.alert('Hata', 'Veriler kaydedilirken bir hata oluştu.');
@@ -360,4 +360,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PriceEntryScreen;
+export default NonBusinessPriceEntryScreen;

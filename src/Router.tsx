@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -35,13 +35,36 @@ import NonBussineRegisterScreen from './pages/BusinessScreen/NonBussinesRegister
 import NBVerificationScreen from './pages/BusinessScreen/SignScreens/NBVerificiationScreen';
 import ContiuneNonRegisterScreen from './pages/BusinessScreen/ContiuneNonRegisterScreen';
 import NonPriceEntryScreen from './pages/BusinessScreen/NonPriceEntryScreen';
-import NonBusinessHomeScreen from './pages/BusinessScreen/NonBussinesHomeScreen';
 import NonBussinesProfileScreen from './pages/BusinessScreen/SignScreens/NonBussinesProfileScreen';
 import NonBussinesCampaignScreen from './pages/BusinessScreen/NonBussinesCampaignScreen';
 import TryScreen from './pages/TryScreen';
 import MeetingScreen from './pages/Home/MarketsScreen/MeetingScreen';
 import {RootStackParamList} from './types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import BussinesPendingServiceDetails from './pages/BusinessScreen/BussinesPendingServicesDetails';
+import BussinesServiceDetails from './pages/BusinessScreen/BussinesServiceDetails';
+import BusinessCompletedDetailsScreen from './pages/BusinessScreen/BusinessCompletedDetailsScreen';
+import UserPendingServices from './pages/Home/BarScreens/UserPendingServices';
+import UserCompletedServices from './pages/Home/BarScreens/UserCompletedServices';
+import UserActivetedServices from './pages/Home/BarScreens/UserActivetedServices';
+import UserActivetedServicesArea from './pages/Home/BarScreens/UserActivetedServicesArea';
+import UserCompletedServicesArea from './pages/Home/BarScreens/UserCompletedServicesArea';
+import UserPendingServicesArea from './pages/Home/BarScreens/UserPendingServicesArea';
+import NonBusinessPriceEntryScreen from './pages/BusinessScreen/NonBusinessPriceEntryScreen';
+import NonBusinessHomeScreen from './pages/BusinessScreen/NonBusinessHomeScreen';
+import BussinesCompletedServicesArea from './pages/BusinessScreen/BussinesCompletedServicesArea';
+import BussinesActivitiedServicesArea from './pages/BusinessScreen/BussinesActivitiedServicesArea';
+import BussinesPendingServicesArea from './pages/BusinessScreen/BussinesPendingServicesArea';
+import BussinesActivitiedServiceDetails from './pages/BusinessScreen/BussinesActivitiedServicesDetails';
+import BussinesCompletedServiceDetails from './pages/BusinessScreen/BussinesCompletedServicesDetails';
+import BActivitiedServiceDetails from './pages/BusinessScreen/BActivitiedServicesDetailScreen';
+import BCompletedServiceDetails from './pages/BusinessScreen/BCompletedServicesDetailScreen';
+import BPendingServiceDetails from './pages/BusinessScreen/BPendingServicesDetail';
+import BActivitiedServicesArea from './pages/BusinessScreen/BActivitiedServicesArea';
+import BCompletedServicesArea from './pages/BusinessScreen/BCompletedServicesArea';
+import BPendingServicesArea from './pages/BusinessScreen/BPendingServicesArea';
+import UserCommentScreen from './pages/Home/BarScreens/UserCommentScreen';
+import BussinesCommentScreen from './pages/BusinessScreen/BussinesCommentScreen';
 
 type CategoriesScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -50,7 +73,7 @@ type CategoriesScreenProps = NativeStackScreenProps<
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -60,7 +83,6 @@ export default function App() {
         <Stack.Screen name="MarketScreen" component={MarketScreen} />
         <Stack.Screen name="FindScreen" component={FindScreen} />
         <Stack.Screen name="MeetingScreen" component={MeetingScreen} />
-
         <Stack.Screen
           name="BusinessEntryScreen"
           component={BusinessEntryScreen}
@@ -73,6 +95,27 @@ export default function App() {
           name="NonBusinessEntryScreen"
           component={NonBusinessEntryScreen}
         />
+        <Stack.Screen
+          name="BussinesActivitiedServiceDetails"
+          component={BussinesActivitiedServiceDetails}
+        />
+        <Stack.Screen
+          name="BussinesCompletedServiceDetails"
+          component={BussinesCompletedServiceDetails}
+        />
+
+        <Stack.Screen
+          name="BussinesServiceDetails"
+          component={BussinesServiceDetails}
+        />
+        <Stack.Screen
+          name="BusinessCompletedDetailsScreen"
+          component={BusinessCompletedDetailsScreen}
+        />
+        <Stack.Screen
+          name="BussinesPendingServiceDetails"
+          component={BussinesPendingServiceDetails}
+        />
         <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
         <Stack.Screen
           name="VerificationScreen"
@@ -80,6 +123,34 @@ export default function App() {
         />
         <Stack.Screen name="FavsScreen" component={FavsScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen
+          name="UserPendingServicesArea"
+          component={UserPendingServicesArea}
+          initialParams={{serviceId: ''}}
+        />
+        <Stack.Screen
+          name="UserCompletedServicesArea"
+          component={UserCompletedServicesArea}
+          initialParams={{serviceId: ''}}
+        />
+        <Stack.Screen
+          name="UserActivetedServicesArea"
+          component={UserActivetedServicesArea}
+          initialParams={{serviceId: ''}}
+        />
+        <Stack.Screen
+          name="UserActivetedServices"
+          component={UserActivetedServices}
+        />
+        <Stack.Screen
+          name="UserCompletedServices"
+          component={UserCompletedServices}
+          initialParams={{serviceId: ''}}
+        />
+        <Stack.Screen
+          name="UserPendingServices"
+          component={UserPendingServices}
+        />
         <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
         <Stack.Screen name="CampaignScreen" component={CampaignScreen} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
@@ -87,9 +158,8 @@ export default function App() {
           name="CategoriesScreen"
           component={CategoriesScreen}
           options={{title: 'Categories'}}
-          initialParams={{storeId: 'default-store-id'}} // Varsayılan `storeId` parametresi
+          initialParams={{storeId: 'default-store-id'}}
         />
-        <Stack.Screen name="CommentScreen" component={CommentScreen} />
         <Stack.Screen name="BEntryScreen" component={BEntryScreen} />
         <Stack.Screen name="BRegisterScreen" component={BRegisterScreen} />
         <Stack.Screen
@@ -136,6 +206,11 @@ export default function App() {
           component={NonBussineRegisterScreen}
         />
         <Stack.Screen
+          name="NonBusinessPriceEntryScreen"
+          component={NonBusinessPriceEntryScreen}
+        />
+
+        <Stack.Screen
           name="NBVerificiationScreen"
           component={NBVerificationScreen}
         />
@@ -159,8 +234,58 @@ export default function App() {
           name="NonBussinesCampaignScreen"
           component={NonBussinesCampaignScreen}
         />
+        <Stack.Screen
+          name="BussinesPendingServicesArea"
+          component={BussinesPendingServicesArea}
+        />
+        <Stack.Screen
+          name="BussinesActivitiedServicesArea"
+          component={BussinesActivitiedServicesArea}
+        />
+        <Stack.Screen
+          name="BussinesCompletedServicesArea"
+          component={BussinesCompletedServicesArea}
+        />
+        <Stack.Screen
+          name="BCompletedServicesArea"
+          component={BCompletedServicesArea}
+        />
+        <Stack.Screen
+          name="BPendingServicesArea"
+          component={BPendingServicesArea}
+        />
+        <Stack.Screen
+          name="BActivitiedServicesArea"
+          component={BActivitiedServicesArea}
+        />
+
+        <Stack.Screen
+          name="BCompletedServiceDetails"
+          component={BCompletedServiceDetails}
+        />
+        <Stack.Screen
+          name="BPendingServiceDetails"
+          component={BPendingServiceDetails}
+        />
+        <Stack.Screen
+          name="BActivitiedServiceDetails"
+          component={BActivitiedServiceDetails}
+        />
+        <Stack.Screen
+          name="UserCommentScreen"
+          component={UserCommentScreen}
+          initialParams={{serviceId: '', businessId: ''}}
+        />
+        <Stack.Screen name="CommentScreen" component={CommentScreen} />
+        <Stack.Screen
+          name="BussinesCommentScreen"
+          component={BussinesCommentScreen}
+        />
+
         <Stack.Screen name="Try" component={TryScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+export default App;

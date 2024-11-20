@@ -13,7 +13,7 @@ export type RootStackParamList = {
   CampaignScreen: undefined;
   HomeScreen: undefined;
   CategoriesScreen: {storeId: string};
-  CommentScreen: undefined;
+  CommentScreen: {ownerId: string};
   BEntryScreen: undefined;
   BRegisterScreen: undefined;
   ContiuneRegisterScreen: undefined;
@@ -35,11 +35,79 @@ export type RootStackParamList = {
   NonBusinessHomeScreen: undefined;
   NonBussinesProfileScreen: undefined;
   NonBussinesCampaignScreen: undefined;
+  BussinesServiceDetails: {serviceId: string};
+  BussinesPendingDetailscreen: undefined;
   MeetingScreen: {
     ownerId: string;
     selectedServices: SelectedService[];
   };
   Try: undefined;
+  NBEntryScreen: undefined;
+  NBRegisterScreen: undefined;
+  BusinessCompletedDetailsScreen: undefined;
+  UserCompletedServices: {
+    serviceId: string;
+    bussinessId: string;
+  };
+  UserActivetedServices: {
+    serviceId: string;
+  };
+
+  UserPendingServices: {
+    serviceId: string;
+  };
+  UserPendingServicesArea: {
+    serviceId: string;
+  };
+  UserActivetedServicesArea: {
+    serviceId: string;
+  };
+  UserCompletedServicesArea: {
+    serviceId: string;
+    businessId: string;
+  };
+  NonBusinessPriceEntryScreen: {storeId: string};
+  BussinesCompletedServicesArea: {
+    serviceId: string;
+  };
+  BussinesPendingServicesArea: {
+    serviceId: string;
+  };
+  BussinesActivitiedServicesArea: {
+    serviceId: string;
+  };
+  BussinesPendingServiceDetails: {
+    serviceId: string;
+  };
+  BussinesCompletedServiceDetails: {
+    serviceId: string;
+  };
+  BussinesActivitiedServiceDetails: {
+    serviceId: string;
+  };
+  BPendingServicesArea: {
+    serviceId: string;
+  };
+  BCompletedServicesArea: {
+    serviceId: string;
+  };
+  BActivitiedServicesArea: {
+    serviceId: string;
+  };
+  BPendingServiceDetails: {
+    serviceId: string;
+  };
+  BCompletedServiceDetails: {
+    serviceId: string;
+  };
+  BActivitiedServiceDetails: {
+    serviceId: string;
+  };
+  UserCommentScreen: {
+    serviceId: string;
+    businessId: string;
+  };
+  BussinesCommentScreen: undefined;
 };
 
 export type SelectedService = {
@@ -48,3 +116,5 @@ export type SelectedService = {
   quantity: number;
   price: number;
 };
+
+// types.ts

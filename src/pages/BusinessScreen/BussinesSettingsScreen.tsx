@@ -10,14 +10,17 @@ import {
   Platform,
   PixelRatio,
   ScrollView,
+  BackHandler,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {TokenService} from '../../TokenService';
+import {useFocusEffect} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 const scale = width / 375;
+const navigation = useNavigation();
 
 const normalize = (size: number) => {
   const newSize = size * scale;
@@ -87,6 +90,19 @@ const BussinesSettingsScreen: React.FC = () => {
       console.error('Çıkış yaparken hata oluştu:', error);
     }
   };
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [navigation]),
+  );
 
   return (
     <LinearGradient

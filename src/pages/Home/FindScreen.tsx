@@ -12,6 +12,7 @@ import {
 import {NavigationProp} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Apiurl from '../../Apiurl';
 
 const {width, height} = Dimensions.get('window');
 
@@ -35,9 +36,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
   const fetchStores = async () => {
     try {
-      const response = await fetch(
-        'http://10.0.2.2:5150/api/Store/GetAllStores',
-      );
+      const response = await fetch(`${Apiurl}/api/Store/GetAllStores`);
       const data = await response.json();
       if (data.isSuccess) {
         setCategories(data.result);

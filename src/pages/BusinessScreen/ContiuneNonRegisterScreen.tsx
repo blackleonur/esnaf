@@ -1,61 +1,77 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   Alert,
   Dimensions,
-  PixelRatio,
+  StyleSheet,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {NavigationProp} from '@react-navigation/native';
-import {useNavigation} from '@react-navigation/native';
+import {
+  RouteProp,
+  useRoute,
+  NavigationProp,
+  useNavigation,
+} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios';
+import {TokenService} from '../../TokenService';
+import Apiurl from '../../Apiurl';
 
 const {width, height} = Dimensions.get('window');
 
-// Dinamik boyutlar için yardımcı fonksiyonlar
-const scale = width / 320;
-const normalize = (size: number) =>
-  Math.round(PixelRatio.roundToNearestPixel(size * scale));
+interface Params {
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  password: string;
+  identityNumber: string;
+}
 
-const ContiuneNonRegisterScreen = () => {
-  const [workplaceName, setWorkplaceName] = useState('');
-  const [address, setAddress] = useState('');
-  const [taxNumber, setTaxNumber] = useState('');
-  const [kvkkAccepted, setKvkkAccepted] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+const ContinueNonRegisterScreen = () => {
+  const route = useRoute<RouteProp<{params: Params}, 'params'>>();
   const navigation = useNavigation<NavigationProp<any>>();
 
+  const {name, surname, email, phone, password} = route.params || {
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    password: '',
+  };
+
+  const [identityNumber, setIdentityNumber] = useState(''); // State for TCKN
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [items, setItems] = useState([
-    {label: 'Bakıcı', value: 'bakici'},
-    {label: 'Temizlikçi', value: 'temizlikci'},
-    {label: 'Matematik Öğretmeni', value: 'matematik_ogretmeni'},
-    {label: 'Tesisatçı', value: 'tesisatci'},
-    {label: 'Elektrikçi', value: 'elektrikci'},
-    {label: 'Bakıcı', value: 'bakici'},
-    {label: 'Kepçe Operatörü', value: 'kepce_operatoru'},
-    {label: 'Temizlikçi', value: 'temizlikci'},
-    {label: 'Boyacı', value: 'boyaci'},
-    {label: 'Tamirci', value: 'tamirci'},
-    {label: 'Nakliyeci', value: 'nakliyeci'},
-    {label: 'Bahçıvan', value: 'bahcivan'},
-    {label: 'IT Destek Uzmanı', value: 'it_destek_uzmani'},
-    {label: 'Eğitmen', value: 'egitmen'},
-    {label: 'Güvenlik Görevlisi', value: 'guvenlik_gorevlisi'},
-    {label: 'Su Tesisatçısı', value: 'su_tesisatcisi'},
-    {label: 'Mekanik Ustası', value: 'mekanik_ustasi'},
-    {label: 'Marangoz', value: 'marangoz'},
-    {label: 'İnşaat İşçisi', value: 'insaat_iscisi'},
-    {label: 'Mobilya Montajcısı', value: 'mobilya_montajcisi'},
-    {label: 'İlaçlama Servisi', value: 'ilaclama_servisi'},
-    {label: 'Klima Teknisyeni', value: 'klima_teknisyeni'},
-  ]);
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [items, setItems] = useState<{label: string; value: string}[]>([]);
+  const [description, setDescription] = useState(''); // New state for description
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await axios.get(`${Apiurl}/api/Store/GetAllStores`);
+        const stores = response.data.result;
+        const formattedStores = stores.map(
+          (store: {id: string; storeName: string}) => ({
+            label: store.storeName,
+            value: store.id,
+          }),
+        );
+        setItems(formattedStores);
+      } catch (error) {
+        console.error('Mağazalar getirilemedi:', error);
+      }
+    };
+
+    fetchStores();
+  }, []);
 
   const showKvkkAlert = () => {
     Alert.alert(
@@ -75,26 +91,59 @@ const ContiuneNonRegisterScreen = () => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
-      kvkkAccepted &&
-      termsAccepted &&
-      value &&
-      workplaceName &&
-      address &&
-      taxNumber
+      !kvkkAccepted ||
+      !termsAccepted ||
+      !selectedStoreId ||
+      !description ||
+      !identityNumber
     ) {
-      console.log('Form başarıyla gönderildi.');
-    } else {
       Alert.alert(
         'Hata',
         'Lütfen tüm alanları doldurun ve metinleri onaylayın.',
       );
+      return;
     }
-  };
 
-  const goNonPrice = () => {
-    navigation.navigate('NonPriceEntryScreen');
+    try {
+      const data = {
+        sellerFirstName: name,
+        sellerLastName: surname,
+        sellerPhone: phone,
+        sellerIdentityNumber: identityNumber, // Include TCKN in request payload
+        sellerEmail: email,
+        sellerDescription: description,
+        password: password,
+        storeId: selectedStoreId,
+      };
+
+      const response = await axios.post(
+        `${Apiurl}/api/IndividualSeller/Register`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        const token = response.data.result.token;
+        await TokenService.setToken(token);
+
+        Alert.alert('Başarılı', 'Kayıt işlemi başarıyla tamamlandı.');
+        navigation.navigate('NonBusinessPriceEntryScreen', {
+          storeId: selectedStoreId,
+        });
+        console.log('Storeid:', selectedStoreId);
+      } else {
+        Alert.alert('Hata', 'Kayıt işlemi başarısız.');
+      }
+    } catch (error) {
+      console.error('Kayıt işlemi sırasında bir hata oluştu:', error);
+      Alert.alert('Hata', 'Kayıt işlemi sırasında bir hata oluştu.');
+    }
   };
 
   return (
@@ -106,7 +155,17 @@ const ContiuneNonRegisterScreen = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Profilinizi Doldurun</Text>
 
-        <Text style={styles.label}>İş Kategorisi</Text>
+        {/* TCKN Input */}
+        <Text style={styles.header}>TC Kimlik Numarası</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="TC Kimlik Numaranızı girin..."
+          value={identityNumber}
+          onChangeText={setIdentityNumber}
+          keyboardType="numeric"
+        />
+
+        <Text style={styles.header}>İş Kategorisi</Text>
         <DropDownPicker
           open={open}
           value={value}
@@ -120,15 +179,16 @@ const ContiuneNonRegisterScreen = () => {
           searchTextInputStyle={styles.searchInput}
           listItemLabelStyle={styles.listItemLabel}
           dropDownContainerStyle={styles.dropDownContainer}
+          onChangeValue={val => setSelectedStoreId(val)}
         />
 
-        <Text style={styles.label}>Tc Kimlik Numarası</Text>
+        <Text style={styles.header}>Açıklama</Text>
         <TextInput
-          style={styles.input}
-          value={taxNumber}
-          onChangeText={setTaxNumber}
-          placeholder="TC Kimlik Numaranızı Girin"
-          keyboardType="numeric"
+          style={styles.textInput}
+          placeholder="Açıklamanızı buraya girin..."
+          value={description}
+          onChangeText={setDescription}
+          multiline
         />
 
         <View style={styles.checkboxContainer}>
@@ -161,9 +221,9 @@ const ContiuneNonRegisterScreen = () => {
           colors={['#F36117', '#0a040a']}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
-          style={{borderRadius: 65}}>
-          <TouchableOpacity style={styles.button} onPress={goNonPrice}>
-            <Text style={styles.buttonText}>Fiyat Seçeneklerini Gir</Text>
+          style={styles.buttonGradient}>
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Fiyatlandırmaya Devam</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>
@@ -173,66 +233,71 @@ const ContiuneNonRegisterScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: normalize(20),
+    padding: width * 0.05,
     justifyContent: 'center',
   },
   title: {
-    fontSize: normalize(24),
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: normalize(20),
-  },
-  label: {
-    fontSize: normalize(16),
-    marginBottom: normalize(5),
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: normalize(10),
-    borderRadius: normalize(8),
-    marginBottom: normalize(15),
+    marginBottom: height * 0.02,
   },
   dropdown: {
-    backgroundColor: '#fafafa',
     borderColor: '#ccc',
-    borderRadius: normalize(8),
+    borderRadius: 8,
+    backgroundColor: '#e5e5e5',
+    width: '100%',
   },
   dropDownContainer: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ccc',
-    borderRadius: normalize(8),
+    borderRadius: 8,
   },
   searchInput: {
     borderColor: '#007BFF',
     borderWidth: 1,
-    padding: normalize(8),
-    borderRadius: normalize(8),
+    padding: width * 0.03,
+    borderRadius: 8,
   },
   listItemLabel: {
     color: '#333',
-    fontSize: normalize(16),
+    fontSize: width * 0.04,
+  },
+  textInput: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: width * 0.03,
+    backgroundColor: '#f5f5f5',
+    marginBottom: height * 0.02,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: normalize(15),
+    marginBottom: height * 0.02,
   },
   checkboxText: {
-    fontSize: normalize(16),
+    fontSize: width * 0.04,
     color: 'gray',
-    marginLeft: normalize(10),
+    marginLeft: width * 0.03,
+  },
+  buttonGradient: {
+    borderRadius: 25,
+    marginTop: height * 0.02,
   },
   button: {
-    padding: normalize(15),
-    borderRadius: normalize(8),
+    padding: height * 0.02,
+    borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: normalize(16),
+    fontSize: width * 0.04,
     fontWeight: 'bold',
+  },
+  header: {
+    fontSize: width * 0.04,
+    fontWeight: 'bold',
+    marginBottom: height * 0.01,
   },
 });
 
-export default ContiuneNonRegisterScreen;
+export default ContinueNonRegisterScreen;

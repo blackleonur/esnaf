@@ -4,27 +4,27 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Linking,
-  Image,
-  Dimensions,
-  PixelRatio,
   ActivityIndicator,
+  Modal,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
-import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Apiurl from '../../../Apiurl';
+import {TokenService} from '../../TokenService';
+import {Dimensions, PixelRatio} from 'react-native';
+import Apiurl from '../../Apiurl';
 
-// Ekran boyutlarını almak için Dimensions kullanıyoruz
 const {width} = Dimensions.get('window');
-
-// Dinamik boyutlar için oranları hesaplayalım
 const scale = width / 375;
 const normalize = (size: number) => {
   const newSize = size * scale;
   return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
+// Types
 type Review = {
   id: string;
   userId: string;
@@ -54,34 +54,42 @@ type ResponseData = {
   businessName: string;
 };
 
-const CommentScreen = () => {
-  const route = useRoute();
-  const {ownerId} = route.params as {ownerId: string};
-
+const BussinesCommentScreen = () => {
   const [data, setData] = useState<ResponseData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [replyContent, setReplyContent] = useState('');
+  const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCommentsAndRatings = async () => {
-      try {
+  const fetchData = async () => {
+    try {
+      const decodedToken = await TokenService.decodeToken();
+      if (decodedToken && decodedToken.nameid) {
+        setOwnerId(decodedToken.nameid);
+
         const response = await axios.get(
-          `${Apiurl}/api/Review/GetAllCommentAndRating/${ownerId}`,
+          `${Apiurl}/api/Review/GetAllCommentAndRating/${decodedToken.nameid}`,
         );
 
         if (response.data.isSuccess) {
           setData(response.data.result);
         } else {
-          console.error('Veri alınırken hata oluştu');
+          console.error('Failed to fetch data');
         }
-      } catch (error) {
-        console.error('API hatası:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error('Failed to retrieve owner ID from token');
       }
-    };
+    } catch (error) {
+      console.error('API or token error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchCommentsAndRatings();
-  }, [ownerId]);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
@@ -116,6 +124,37 @@ const CommentScreen = () => {
     );
   };
 
+  const openReplyModal = (reviewId: string) => {
+    setSelectedReviewId(reviewId);
+    setModalVisible(true);
+  };
+
+  const sendReply = async () => {
+    if (selectedReviewId && replyContent.trim()) {
+      try {
+        const response = await axios.post('${Apiurl}/api/Reply/AddReply', {
+          reviewId: selectedReviewId,
+          responderId: ownerId,
+          replyContent: replyContent,
+        });
+
+        if (response.data.isSuccess) {
+          Alert.alert('Başarılı', 'Yanıt gönderildi');
+          setModalVisible(false);
+          setReplyContent('');
+          fetchData(); // Güncel veriyi çek
+        } else {
+          Alert.alert('Hata', 'Yanıt gönderilemedi');
+        }
+      } catch (error) {
+        console.error('Yanıt gönderme hatası:', error);
+        Alert.alert('Hata', 'Bir hata oluştu');
+      }
+    } else {
+      Alert.alert('Hata', 'Yanıt içeriği boş olamaz.');
+    }
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -147,12 +186,10 @@ const CommentScreen = () => {
           {renderStars(data.averages.qualityAverage)}
         </View>
       </View>
-
       <Text style={styles.header}>Yorumlar</Text>
-
       <FlatList
         data={data.reviews}
-        keyExtractor={item => item.userId + item.createdDate}
+        keyExtractor={item => item.id}
         renderItem={({item}) => (
           <View style={styles.commentCard}>
             <View style={styles.commentContainer}>
@@ -172,15 +209,15 @@ const CommentScreen = () => {
             <View style={styles.StarsRating}>
               <View style={styles.starsContainer}>
                 <Text style={styles.ratingLabel}>Timing: </Text>
-                {renderStars(Math.floor(item.timingRating))}
+                {renderStars(item.timingRating)}
               </View>
               <View style={styles.starsContainer}>
                 <Text style={styles.ratingLabel}>Reliability: </Text>
-                {renderStars(Math.floor(item.reliabilityRating))}
+                {renderStars(item.reliabilityRating)}
               </View>
               <View style={styles.starsContainer}>
                 <Text style={styles.ratingLabel}>Quality: </Text>
-                {renderStars(Math.floor(item.qualityRating))}
+                {renderStars(item.qualityRating)}
               </View>
             </View>
             {item.reply ? (
@@ -197,10 +234,34 @@ const CommentScreen = () => {
                   </Text>
                 )}
               </View>
-            ) : null}
+            ) : (
+              <TouchableOpacity onPress={() => openReplyModal(item.id)}>
+                <Text style={styles.replyButton}>Yanıtla</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       />
+      {/* Yanıt Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Yanıt Ver</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Yanıtınızı yazın"
+              value={replyContent}
+              onChangeText={setReplyContent}
+            />
+            <Button title="Gönder" onPress={sendReply} />
+            <Button title="İptal" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -210,10 +271,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f5f5f5',
-  },
-  SmallContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
   },
   allRatingContainer: {
     flexDirection: 'row',
@@ -225,11 +282,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 8,
   },
-  Comment: {
-    marginTop: 8,
-    flexDirection: 'column',
-  },
-
   stars: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -251,6 +303,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 18,
   },
+  Comment: {
+    marginTop: 8,
+    flexDirection: 'column',
+  },
   header: {
     fontSize: 18,
     textAlign: 'center',
@@ -269,17 +325,9 @@ const styles = StyleSheet.create({
     borderColor: '#e3ca8f',
   },
   commentContainer: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: {width: 0, height: 1},
-    elevation: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', // Dikeyde hizalama
+    alignItems: 'center',
   },
   commentTitle: {
     fontSize: 18,
@@ -348,6 +396,33 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginRight: 5,
   },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: '100%',
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
 });
 
-export default CommentScreen;
+export default BussinesCommentScreen;

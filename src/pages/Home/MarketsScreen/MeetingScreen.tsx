@@ -13,6 +13,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {RootStackParamList} from '../../../types';
 import {TokenService} from '../../../TokenService';
+import Apiurl from '../../../Apiurl';
 
 type MeetingScreenRouteProp = RouteProp<RootStackParamList, 'MeetingScreen'>;
 
@@ -100,16 +101,13 @@ const MeetingScreen = () => {
     };
 
     try {
-      const response = await fetch(
-        'http://10.0.2.2:5150/api/Service/AddService',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
+      const response = await fetch('${Apiurl}/api/Service/AddService', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify(requestBody),
+      });
 
       if (response.ok) {
         Alert.alert('Başarılı', 'Randevu başarıyla kaydedildi!');
