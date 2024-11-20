@@ -1,27 +1,24 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   Alert,
   Dimensions,
   StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {
-  RouteProp,
-  useRoute,
-  NavigationProp,
-  useNavigation,
-} from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import axios from 'axios';
-import {TokenService} from '../../TokenService';
-import Apiurl from '../../Apiurl';
 
-const {width, height} = Dimensions.get('window');
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios';
+import CheckBox from 'expo-checkbox';
+import { LinearGradient } from 'expo-linear-gradient';
+
+import Apiurl from '../../Apiurl';
+import { TokenService } from '../../TokenService';
+
+const { width, height } = Dimensions.get('window');
 
 interface Params {
   name: string;
@@ -33,10 +30,10 @@ interface Params {
 }
 
 const ContinueNonRegisterScreen = () => {
-  const route = useRoute<RouteProp<{params: Params}, 'params'>>();
+  const route = useRoute<RouteProp<{ params: Params }, 'params'>>();
   const navigation = useNavigation<NavigationProp<any>>();
 
-  const {name, surname, email, phone, password} = route.params || {
+  const { name, surname, email, phone, password } = route.params || {
     name: '',
     surname: '',
     email: '',
@@ -50,7 +47,7 @@ const ContinueNonRegisterScreen = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
-  const [items, setItems] = useState<{label: string; value: string}[]>([]);
+  const [items, setItems] = useState<{ label: string; value: string }[]>([]);
   const [description, setDescription] = useState(''); // New state for description
 
   useEffect(() => {
@@ -58,12 +55,10 @@ const ContinueNonRegisterScreen = () => {
       try {
         const response = await axios.get(`${Apiurl}/api/Store/GetAllStores`);
         const stores = response.data.result;
-        const formattedStores = stores.map(
-          (store: {id: string; storeName: string}) => ({
-            label: store.storeName,
-            value: store.id,
-          }),
-        );
+        const formattedStores = stores.map((store: { id: string; storeName: string }) => ({
+          label: store.storeName,
+          value: store.id,
+        }));
         setItems(formattedStores);
       } catch (error) {
         console.error('Mağazalar getirilemedi:', error);
@@ -77,8 +72,8 @@ const ContinueNonRegisterScreen = () => {
     Alert.alert(
       'KVKK Metni',
       'KVKK metnini buraya ekleyin...',
-      [{text: 'Okudum, anladım', onPress: () => setKvkkAccepted(true)}],
-      {cancelable: false},
+      [{ text: 'Okudum, anladım', onPress: () => setKvkkAccepted(true) }],
+      { cancelable: false }
     );
   };
 
@@ -86,23 +81,14 @@ const ContinueNonRegisterScreen = () => {
     Alert.alert(
       'Kullanım Şartları',
       'Kullanım şartları metnini buraya ekleyin...',
-      [{text: 'Okudum, anladım', onPress: () => setTermsAccepted(true)}],
-      {cancelable: false},
+      [{ text: 'Okudum, anladım', onPress: () => setTermsAccepted(true) }],
+      { cancelable: false }
     );
   };
 
   const handleSubmit = async () => {
-    if (
-      !kvkkAccepted ||
-      !termsAccepted ||
-      !selectedStoreId ||
-      !description ||
-      !identityNumber
-    ) {
-      Alert.alert(
-        'Hata',
-        'Lütfen tüm alanları doldurun ve metinleri onaylayın.',
-      );
+    if (!kvkkAccepted || !termsAccepted || !selectedStoreId || !description || !identityNumber) {
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurun ve metinleri onaylayın.');
       return;
     }
 
@@ -118,15 +104,11 @@ const ContinueNonRegisterScreen = () => {
         storeId: selectedStoreId,
       };
 
-      const response = await axios.post(
-        `${Apiurl}/api/IndividualSeller/Register`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await axios.post(`${Apiurl}/api/IndividualSeller/Register`, data, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       if (response.status === 200) {
         const token = response.data.result.token;
@@ -149,9 +131,9 @@ const ContinueNonRegisterScreen = () => {
   return (
     <LinearGradient
       colors={['#FFFFFF', '#A6A6A6']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={{flex: 1}}>
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>Profilinizi Doldurun</Text>
 
@@ -159,10 +141,10 @@ const ContinueNonRegisterScreen = () => {
         <Text style={styles.header}>TC Kimlik Numarası</Text>
         <TextInput
           style={styles.textInput}
-          placeholder="TC Kimlik Numaranızı girin..."
+          placeholder='TC Kimlik Numaranızı girin...'
           value={identityNumber}
           onChangeText={setIdentityNumber}
-          keyboardType="numeric"
+          keyboardType='numeric'
         />
 
         <Text style={styles.header}>İş Kategorisi</Text>
@@ -173,7 +155,7 @@ const ContinueNonRegisterScreen = () => {
           setOpen={setOpen}
           setValue={setValue}
           setItems={setItems}
-          placeholder="Kategori seçin..."
+          placeholder='Kategori seçin...'
           searchable={true}
           style={styles.dropdown}
           searchTextInputStyle={styles.searchInput}
@@ -185,7 +167,7 @@ const ContinueNonRegisterScreen = () => {
         <Text style={styles.header}>Açıklama</Text>
         <TextInput
           style={styles.textInput}
-          placeholder="Açıklamanızı buraya girin..."
+          placeholder='Açıklamanızı buraya girin...'
           value={description}
           onChangeText={setDescription}
           multiline
@@ -194,33 +176,29 @@ const ContinueNonRegisterScreen = () => {
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={termsAccepted}
-            tintColors={{true: '#007BFF', false: '#ccc'}}
+            tintColors={{ true: '#007BFF', false: '#ccc' }}
             disabled={true}
           />
           <TouchableOpacity onPress={showTermsAlert}>
-            <Text style={styles.checkboxText}>
-              Kullanım şartlarını kabul ediyorum
-            </Text>
+            <Text style={styles.checkboxText}>Kullanım şartlarını kabul ediyorum</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={kvkkAccepted}
-            tintColors={{true: '#007BFF', false: '#ccc'}}
+            tintColors={{ true: '#007BFF', false: '#ccc' }}
             disabled={true}
           />
           <TouchableOpacity onPress={showKvkkAlert}>
-            <Text style={styles.checkboxText}>
-              KVKK metnini okudum, onaylıyorum
-            </Text>
+            <Text style={styles.checkboxText}>KVKK metnini okudum, onaylıyorum</Text>
           </TouchableOpacity>
         </View>
 
         <LinearGradient
           colors={['#F36117', '#0a040a']}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.buttonGradient}>
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={styles.buttonText}>Fiyatlandırmaya Devam</Text>

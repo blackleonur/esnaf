@@ -1,27 +1,24 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   Alert,
   Dimensions,
   StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {
-  RouteProp,
-  useRoute,
-  NavigationProp,
-  useNavigation,
-} from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import axios from 'axios';
-import {TokenService} from '../../TokenService';
-import Apiurl from '../../Apiurl';
 
-const {width, height} = Dimensions.get('window');
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios';
+import CheckBox from 'expo-checkbox';
+import { LinearGradient } from 'expo-linear-gradient';
+
+import Apiurl from '../../Apiurl';
+import { TokenService } from '../../TokenService';
+
+const { width, height } = Dimensions.get('window');
 
 // Parametrelerin tiplerini tanımlıyoruz
 interface Params {
@@ -33,10 +30,10 @@ interface Params {
 }
 
 const ProfileScreen = () => {
-  const route = useRoute<RouteProp<{params: Params}, 'params'>>(); // Tip tanımlaması
+  const route = useRoute<RouteProp<{ params: Params }, 'params'>>(); // Tip tanımlaması
   const navigation = useNavigation<NavigationProp<any>>();
 
-  const {name, surname, email, phone, password} = route.params || {
+  const { name, surname, email, phone, password } = route.params || {
     name: '',
     surname: '',
     email: '',
@@ -52,7 +49,7 @@ const ProfileScreen = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
-  const [items, setItems] = useState<{label: string; value: string}[]>([]);
+  const [items, setItems] = useState<{ label: string; value: string }[]>([]);
 
   // Mağaza verilerini backend'den çekme
   useEffect(() => {
@@ -60,12 +57,10 @@ const ProfileScreen = () => {
       try {
         const response = await axios.get(`${Apiurl}/api/Store/GetAllStores`);
         const stores = response.data.result;
-        const formattedStores = stores.map(
-          (store: {id: string; storeName: string}) => ({
-            label: store.storeName,
-            value: store.id,
-          }),
-        );
+        const formattedStores = stores.map((store: { id: string; storeName: string }) => ({
+          label: store.storeName,
+          value: store.id,
+        }));
         setItems(formattedStores);
       } catch (error) {
         console.error('Mağazalar getirilemedi:', error);
@@ -79,8 +74,8 @@ const ProfileScreen = () => {
     Alert.alert(
       'KVKK Metni',
       'KVKK metnini buraya ekleyin...',
-      [{text: 'Okudum, anladım', onPress: () => setKvkkAccepted(true)}],
-      {cancelable: false},
+      [{ text: 'Okudum, anladım', onPress: () => setKvkkAccepted(true) }],
+      { cancelable: false }
     );
   };
 
@@ -88,8 +83,8 @@ const ProfileScreen = () => {
     Alert.alert(
       'Kullanım Şartları',
       'Kullanım şartları metnini buraya ekleyin...',
-      [{text: 'Okudum, anladım', onPress: () => setTermsAccepted(true)}],
-      {cancelable: false},
+      [{ text: 'Okudum, anladım', onPress: () => setTermsAccepted(true) }],
+      { cancelable: false }
     );
   };
 
@@ -102,10 +97,7 @@ const ProfileScreen = () => {
       !address ||
       !taxNumber
     ) {
-      Alert.alert(
-        'Hata',
-        'Lütfen tüm alanları doldurun ve metinleri onaylayın.',
-      );
+      Alert.alert('Hata', 'Lütfen tüm alanları doldurun ve metinleri onaylayın.');
       return;
     }
 
@@ -124,15 +116,11 @@ const ProfileScreen = () => {
         BusinessDescription: ' ',
       };
 
-      const response = await axios.post(
-        `${Apiurl}/api/Business/Register`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await axios.post(`${Apiurl}/api/Business/Register`, data, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       if (response.status === 200) {
         const token = response.data.result.token; // Token'ı response'dan alıyoruz
@@ -141,7 +129,7 @@ const ProfileScreen = () => {
         await TokenService.setToken(token);
 
         Alert.alert('Başarılı', 'Kayıt işlemi başarıyla tamamlandı.');
-        navigation.navigate('PriceEntryScreen', {storeId: selectedStoreId}); // storeId'yi PriceEntryScreen'e gönderiyoruz
+        navigation.navigate('PriceEntryScreen', { storeId: selectedStoreId }); // storeId'yi PriceEntryScreen'e gönderiyoruz
       } else {
         Alert.alert('Hata', 'Kayıt işlemi başarısız.');
       }
@@ -154,16 +142,16 @@ const ProfileScreen = () => {
   return (
     <LinearGradient
       colors={['#FFFFFF', '#A6A6A6']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={{flex: 1}}>
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>Profilinizi Doldurun</Text>
 
         <Text style={styles.header}>İş Yeri İsmi</Text>
         <TextInput
           style={styles.input}
-          placeholder="İş yeri ismini girin"
+          placeholder='İş yeri ismini girin'
           value={workplaceName}
           onChangeText={setWorkplaceName}
         />
@@ -176,7 +164,7 @@ const ProfileScreen = () => {
           setOpen={setOpen}
           setValue={setValue}
           setItems={setItems}
-          placeholder="Kategori seçin..."
+          placeholder='Kategori seçin...'
           searchable={true}
           style={styles.dropdown}
           searchTextInputStyle={styles.searchInput}
@@ -184,16 +172,14 @@ const ProfileScreen = () => {
           dropDownContainerStyle={styles.dropDownContainer}
           onChangeValue={val => setSelectedStoreId(val)}
           onSelectItem={item =>
-            item.value !== undefined
-              ? setSelectedStoreId(item.value)
-              : setSelectedStoreId(null)
+            item.value !== undefined ? setSelectedStoreId(item.value) : setSelectedStoreId(null)
           }
         />
 
         <Text style={styles.header}>İş Yeri Adresi</Text>
         <TextInput
           style={styles.input}
-          placeholder="Adresinizi girin"
+          placeholder='Adresinizi girin'
           value={address}
           onChangeText={setAddress}
         />
@@ -201,42 +187,38 @@ const ProfileScreen = () => {
         <Text style={styles.header}>Vergi Numarası</Text>
         <TextInput
           style={styles.input}
-          placeholder="Vergi numaranızı girin"
+          placeholder='Vergi numaranızı girin'
           value={taxNumber}
           onChangeText={setTaxNumber}
-          keyboardType="numeric"
+          keyboardType='numeric'
         />
 
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={termsAccepted}
-            tintColors={{true: '#007BFF', false: '#ccc'}}
+            tintColors={{ true: '#007BFF', false: '#ccc' }}
             disabled={true}
           />
           <TouchableOpacity onPress={showTermsAlert}>
-            <Text style={styles.checkboxText}>
-              Kullanım şartlarını kabul ediyorum
-            </Text>
+            <Text style={styles.checkboxText}>Kullanım şartlarını kabul ediyorum</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={kvkkAccepted}
-            tintColors={{true: '#007BFF', false: '#ccc'}}
+            tintColors={{ true: '#007BFF', false: '#ccc' }}
             disabled={true}
           />
           <TouchableOpacity onPress={showKvkkAlert}>
-            <Text style={styles.checkboxText}>
-              KVKK metnini okudum, onaylıyorum
-            </Text>
+            <Text style={styles.checkboxText}>KVKK metnini okudum, onaylıyorum</Text>
           </TouchableOpacity>
         </View>
 
         <LinearGradient
           colors={['#F36117', '#0a040a']}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.buttonGradient}>
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={styles.buttonText}>Fiyatlandırmaya Devam</Text>
